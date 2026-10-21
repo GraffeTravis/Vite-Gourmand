@@ -1,6 +1,6 @@
 # Préparation Vercel — 21 octobre 2026
 
-Le porteur du projet a créé [travis22/vitegourmand](https://vercel.com/travis22/vitegourmand) et relié le dépôt GitHub. Il confirme que seul le projet Vercel est créé : PostgreSQL, MongoDB et le service d'e-mails restent à préparer. Aucun fournisseur payant n'est souscrit par cette reprise.
+Le porteur du projet a créé [travis22/vitegourmand](https://vercel.com/travis22/vitegourmand) et relié le dépôt GitHub. Il a ensuite créé PostgreSQL sur Neon et le cluster MongoDB Atlas Free : [raccordement et preuves](NEON-ATLAS.md). Les connexions fonctionnent depuis ce poste ; les paramètres d'hébergement, l'accès réseau depuis Vercel et le service d'e-mails restent à préparer. Aucun fournisseur payant n'est souscrit par cette reprise.
 
 ## Constat vérifié
 

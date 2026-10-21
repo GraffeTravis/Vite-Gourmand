@@ -41,7 +41,7 @@ export async function readCatalog(db: PrismaClient, filters: CatalogFilters, inc
     const themes = await tx.theme.findMany({ where: { menuByThemeId: { some: publicMenuWhere(includeDemo) } }, select: { id: true, label: true }, orderBy: [{ label: "asc" }, { id: "asc" }] });
     const diets = await tx.diet.findMany({ where: { menuByDietId: { some: publicMenuWhere(includeDemo) } }, select: { id: true, label: true }, orderBy: [{ label: "asc" }, { id: "asc" }] });
     return { total, rows, themes, diets };
-  }, { isolationLevel: "RepeatableRead" });
+  }, { isolationLevel: "RepeatableRead", maxWait: 10_000, timeout: 15_000 });
   return { menus: rows.map(toSummary), total, page: filters.page, pageCount: Math.ceil(total / CATALOG_PAGE_SIZE), themes, diets };
 }
 

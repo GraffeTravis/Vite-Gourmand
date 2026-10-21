@@ -2,6 +2,7 @@ node_modules
 src/generated
 .next
 .git
+.neon
 .env*
 coverage
 test-results

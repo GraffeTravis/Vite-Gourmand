@@ -1,5 +1,20 @@
 # Journal de développement
 
+## 21 octobre 2026 — raccordement Neon et Atlas
+
+Point de reprise actuel : `feature/raccordement-bases-distantes`, créée à partir du catalogue en revue. Le propriétaire fournit le projet Neon, sa branche `production` et le cluster Atlas Free. La [note de raccordement](NEON-ATLAS.md) conserve les étapes, preuves non sensibles et limites.
+
+- CLI Neon installé et authentifié ; `neon deploy` réussit, sans changement de service. Connexions récupérées dans `.env`, sauvegarde locale préalable et contexte `.neon` ignorés par Git.
+- Atlas connecté avec les informations fournies par le propriétaire. Le mot de passe visible dans la capture doit être renouvelé ; il n'est ni journalisé ni versionné.
+- Prisma/pg conservés ; pool et nettoyage Vercel adaptés, connexion directe réservée aux migrations, deux URL forcées vers les bases jetables dans les tests. Vérification des services ajoutée, en lecture par défaut et avec garde-fous pour les écritures isolées.
+- Les quatre migrations passent sur une branche Neon de test puis se réappliquent sans changement. Écritures/lectures temporaires Neon et Atlas réussies. Après confirmation explicite du propriétaire, les quatre migrations ont aussi été appliquées à `production`, réappliquées sans changement, puis le seed exécuté deux fois : 22 tables métier, trois rôles, huit statuts, zéro compte et zéro menu.
+- Le HTTP 503 du catalogue trouvé pendant ce contrôle venait du démarrage de transaction Prisma (`P2028`) ; le seed distant a rencontré le même délai. Attente et durée bornées adaptées dans le client et le seed ; initialisation et contrôles HTTP rejoués avec succès après correction.
+- `npm run build` réussit avec la configuration finale. Contrôles HTTP en 200 sur la branche de test puis sur `production` en lecture ; les deux connecteurs sont validés. Serveurs arrêtés ; branche/base temporaires et fichiers de connexion de contrôle supprimés. La sauvegarde de configuration locale est conservée, hors de Git.
+- 78 tests unitaires, 31 tests PostgreSQL locaux et 12 parcours Chromium bureau/mobile passent ; lint/types passent ; audit de production à zéro vulnérabilité.
+- Le refus initial du contrôle automatique a été résolu par les preuves isolées puis l'accord explicite du propriétaire. Aucune écriture de contrôle ni donnée fictive n'a été ajoutée à `production`. **J1 reste incomplet** : paramètres Vercel, SMTP, préproduction et reprise applicative restent à finaliser.
+
+Suite : revue séparée de ce lot dépendant du catalogue ; configuration Vercel/SMTP avec les services réels du propriétaire et isolation de la préproduction ; L3 ensuite. Aucun compte privilégié ni menu de démonstration distant créé. La liaison locale à la branche nommée `production` ne constitue pas une recette de mise en production de l'application.
+
 ## 21 octobre 2026 — raccordement GitHub et préparation de publication L0/L1
 
 Cette entrée constitue le point de reprise actuel. La branche `feature/catalogue-public` contient l'avancée L2 du 20 octobre ; `main` et `develop` portaient encore le socle initial. Les décisions du lot catalogue ci-dessous restent acquises et ne sont pas rouvertes.
