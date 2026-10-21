@@ -1,10 +1,10 @@
 # CI/CD GitHub et exploitation sur Vercel
 
-20 octobre 2026. Proposition adaptée au monolithe Next.js du projet. La CI vérifie chaque changement ; la livraison continue prépare une version vérifiée, puis la mise en production reste une action contrôlée. Ce document décrit la cible : seul le workflow minimal `ci.yml` existe aujourd'hui, sans dépôt distant ni déploiement configuré.
+20 octobre 2026. Proposition adaptée au monolithe Next.js du projet. La CI vérifie chaque changement ; la livraison continue prépare une version vérifiée, puis la mise en production reste une action contrôlée. Ce document décrit la cible : le workflow de vérification `ci.yml` existe aujourd'hui, sans dépôt distant ni déploiement configuré.
 
 Voir aussi la [feuille de route](FEUILLE-DE-ROUTE.md), le [plan de tests](PLAN-DE-TESTS.md) et les décisions [D08–D12](DECISIONS-A-VALIDER.md).
 
-Réalisation du 20 octobre : `.github/workflows/ci.yml` contient désormais `qualite`, `integration` PostgreSQL et `validation`, avec délais, permissions de lecture et rapports JUnit. Le job qualité construit sans service de base disponible. Les tests MongoDB/Mailpit, les parcours navigateur et les workflows de déploiement restent à ajouter avec les lots concernés. Aucun workflow n'a encore été exécuté sur GitHub ; voir [AVANCEMENT.md](AVANCEMENT.md).
+Réalisation du 20 octobre : `.github/workflows/ci.yml` contient `qualite`, `integration` PostgreSQL, `parcours` Chromium bureau/mobile et `validation`, avec délais, permissions de lecture et rapports conservés 14 jours. Le job qualité construit sans service de base disponible. Les deux suites avec base utilisent chacune leur PostgreSQL jetable ; les parcours visent le serveur compilé et comprennent axe. Les tests MongoDB/Mailpit et les workflows de déploiement restent à ajouter avec les lots concernés. Aucun workflow n'a encore été exécuté sur GitHub ; voir [AVANCEMENT.md](AVANCEMENT.md).
 
 ## 1. Infrastructure proposée
 
@@ -44,7 +44,7 @@ GitHub Actions pilote les déploiements via la CLI Vercel. Désactiver les dépl
 
 ## 3. Contrôles automatiques avant fusion
 
-Le workflow existant installe avec `npm ci`, valide Prisma et exécute lint, types, tests et build. En L1, le faire évoluer vers les jobs suivants. Les commandes nouvelles sont à ajouter au dépôt avec leurs suites ; elles ne sont pas encore disponibles.
+Le workflow existant installe avec `npm ci`, valide Prisma et exécute lint, types, tests et build. Les quatre jobs suivants existent ; leur couverture continue d'évoluer avec les lots. L'analyse des secrets, les tests MongoDB/Mailpit, les parcours privés et les navigateurs de livraison restent à compléter.
 
 | Job proposé | Exécution | Preuve / condition |
 | --- | --- | --- |
@@ -55,7 +55,7 @@ Le workflow existant installe avec `npm ci`, valide Prisma et exécute lint, typ
 
 Au démarrage, ces jobs peuvent rester peu nombreux et séquentiels pour limiter la configuration. La séparation ci-dessus évite surtout de confondre un test unitaire sans base et une transaction réellement exercée. Ne pas partager une base mutable entre jobs parallèles.
 
-Prévoir `test:unit`, `test:integration`, `test:e2e` et un mode navigateurs de livraison. Conserver `npm test` pour l'usage local simple. Lancer les tests navigateur contre le build de production. Ne jamais exécuter `migrate dev`, `db push` ou un reset de base sur la production ; pour Prisma 7 verrouillé dans ce projet, utiliser le script existant `npm run db:deploy` basé sur `prisma migrate deploy`. [Documentation versionnée Prisma 7](https://www.prisma.io/docs/cli/v7/migrate/deploy).
+Les scripts `test:unit`, `test:integration` et `test:e2e` existent ; prévoir un mode navigateurs de livraison. Conserver `npm test` pour l'usage local simple. Lancer les tests navigateur contre le build de production. Ne jamais exécuter `migrate dev`, `db push` ou un reset de base sur la production ; pour Prisma 7 verrouillé dans ce projet, utiliser le script existant `npm run db:deploy` basé sur `prisma migrate deploy`. [Documentation versionnée Prisma 7](https://www.prisma.io/docs/cli/v7/migrate/deploy).
 
 Pour les PR externes, limiter les permissions à la lecture et ne fournir aucun secret de déploiement. Ne pas employer `pull_request_target` pour exécuter le code de la PR avec des secrets. Le workflow déployant un candidat utilise uniquement du code approuvé sur une branche durable.
 

@@ -1,5 +1,52 @@
 # Journal de développement
 
+## 20 octobre 2026 — poursuite L1 et catalogue public L2
+
+Cette entrée constitue le point de reprise actuel ; l'état initial est conservé plus bas. Branche de travail : `feature/catalogue-public`, créée depuis `develop`. **J1 reste incomplet** : GitHub, CI distante, préproduction et exercice de retour applicatif restent à configurer/vérifier. Aucun lot complet n'est déclaré livré en préproduction.
+
+### Décisions reçues pendant cette reprise
+
+- D03 : gratuité dans la **commune** de Bordeaux ; hors Bordeaux, 5 € + 0,59 €/km sur le trajet aller en voiture le plus rapide depuis le 36 rue de la Benauge, 33100 Bordeaux ; arrondi du prix final au centime ; confirmation impossible si le calcul automatique échoue. Ces règles sont validées, l'adaptateur et le devis serveur restent à développer en L4.
+- D06 : catégorie commune du plat ; au moins une image, un plat et vérification des allergènes avant publication ; archivage d'un menu déjà commandé ; un avis par commande, public après modération. Règles validées par le porteur du projet.
+- D05 : suivi global du matériel par commande, sans inventaire article par article ni retour partiel. Calendrier, notification et application des frais restent ouverts avant L6.
+- D13 : un groupe de 12 voit les menus dont le minimum est inférieur ou égal à 12 ; tous les critères se combinent en ET. Les deux plafonds de prix se combinent en retenant le plus restrictif.
+- D04, accueil sur place/téléphone en heure locale de Bordeaux : lundi fermé ; mardi à vendredi 09:00–13:00 / 14:00–18:00 ; samedi 09:00–13:00 / 14:00–17:00 ; dimanche 09:00–12:30. Valeurs proposées et fournies pour le projet, pas déduites du CDC. Créneaux/délais de livraison à préciser séparément.
+
+### Réalisation
+
+| Élément | État réel |
+| --- | --- |
+| Catalogue | Lecture PostgreSQL, compte des résultats, pagination stable de 12 menus, filtres prix/plage/thème/régime/groupe ; saisies invalides refusées ; réinitialisation et conservation des filtres au retour d'une fiche |
+| Actualisation | Sans rechargement complet ; annulation de la requête précédente et garde contre les réponses anciennes ; état d'attente lisible, réessai après erreur ; changement d'ancre clavier sans nouvelle lecture inutile |
+| Fiche et galerie | Photos alternatives, composition et allergènes par plat, conditions mises en évidence, minimum, régime, thème et stock en nombre de commandes ; menu épuisé visible ; menu caché ou absent en 404 |
+| Publication | Migration 003 : contrôle SQL différé à la fin de transaction ; refus d'une publication incomplète et de la suppression de la dernière image ; nouvelle vérification obligatoire après changement de composition ou d'allergènes ; verrou du menu pour les contrôles concurrents |
+| Contenus publics | Accueil alimenté par les menus et avis approuvés de commandes terminées, sans coordonnées client ; sept jours au footer ; liens légaux menant à des contenus explicitement en attente de validation |
+| Horaires | Migration 004 : cohérence des heures, fermeture et absence de chevauchement ; 12 lignes pour les sept jours fournis ; initialisation rejouable qui ne remplace pas des horaires déjà renseignés ; heures TIME affichées sans conversion vers le fuseau du poste |
+| Données locales | Migrations additives activées dans la base locale initialement vide ; référentiels, trois menus fictifs et horaires du projet ; aucun compte ni avis créé par ces initialisations |
+| Démonstration | Seed de menus séparé et gardé pour les bases locales/test ; marquage IS_DEMO, bandeau, cartes et légendes explicites ; exemples exclus des lectures de production ; images locales copiées depuis les références sans modifier les originaux |
+| CI | Jobs qualité, PostgreSQL, parcours Chromium bureau/mobile et validation ; chaque suite a sa propre base jetable ; rapports JUnit, traces d'échec et captures ; aucune exécution GitHub annoncée |
+
+L'activation locale concerne les blocs désormais définis du catalogue et des horaires. Les tables neutres de sessions et les blocs futurs ne valent pas choix d'une bibliothèque d'authentification ni validation des règles restantes D04/D05/D08. Les migrations déjà appliquées ne doivent plus être réécrites ; toute suite se fait par migration additionnelle.
+
+### Vérifications de cette reprise
+
+- 78 tests unitaires et 31 tests d'intégration PostgreSQL passent. Quatre migrations appliquées sur bases vides et réappliquées sans opération supplémentaire ; bases jetables supprimées après exécution.
+- Recette de 12 scénarios Chromium bureau/mobile contre le build de production : filtres sans nouveau document, combinaison/réinitialisation, galerie, retour aux filtres, HTTP 400/404, panne/réessai, réponses dans le désordre, sept jours, clavier et absence de débordement.
+- axe sur catalogue et fiche ; captures bureau/mobile inspectées. Aucun résultat automatique n'est présenté comme certification RGAA ; lecteur d'écran, appareil réel et autres navigateurs restent à vérifier.
+- Deux anomalies trouvées pendant la recette ont été corrigées : chargement du catalogue qui anticipait un HTTP 200 sur une fiche absente ; perte de contraste liée à l'opacité de la liste pendant son actualisation. Le lien d'évitement ne relance plus les filtres à l'occasion d'un simple changement d'ancre.
+- Lint, types stricts, validation Prisma, build, cohérence du lockfile et YAML CI contrôlés. Les rapports utiles se trouvent dans `test-results/`, exclus de Git et du contexte Docker.
+- Application Docker reconstruite et relancée sans suppression de volume : accueil/catalogue/API en 200, menu absent en 404, trois exemples et filtre de groupe vérifiés. Base locale : 12 plages pour les sept jours, aucun compte/avis ; aucune base jetable restante après les suites.
+- Le pilote pg 8 émet encore un avertissement de dépréciation sur sa file de requêtes dans l'adaptateur Prisma. Les tests passent avec les versions verrouillées ; revoir l'adaptateur avant un passage à pg 9, sans masquer l'avertissement.
+
+### Reprise actuelle
+
+1. Achever L0/L1 distant lorsque le dépôt GitHub et la cible Vercel sont connus ; configurer protections, préproduction, secrets et procédure de reprise. Ne pas déclarer J1 atteint sur les seuls tests locaux.
+2. L2 lecture publique est utilisable localement ; F04 reste partiel (contact/connexion), F10 attend l'identité et la commande, D10 attend les vrais contenus/photos et textes légaux. Les boutons de commande désactivés n'en constituent pas une livraison.
+3. Poursuivre L3 : choix compatible de bibliothèque d'authentification et adaptation des supports neutres si nécessaire, inscription, sessions/révocation, récupération et worker d'outbox. Aucun compte privilégié par le seed ou l'inscription publique.
+4. Puis L4 : adaptateur automatique de distance, devis durable côté serveur, créneaux de livraison encore à valider, réservation/libération idempotente du stock et commande atomique. Ne jamais reprendre les 20 km de démonstration.
+
+La section suivante conserve le premier état du socle et ses anciennes limites ; les décisions et points de reprise ci-dessus prévalent.
+
 ## 20 octobre 2026 — première réalisation L0/L1
 
 Référence : feuille de route v1.0 et cahier des charges v1.2. Ce journal distingue le code réalisé des jalons validés. **J1 n'est pas atteint** : pas de dépôt distant, de CI exécutée sur GitHub ni de préproduction. Le modèle métier reste en revue.

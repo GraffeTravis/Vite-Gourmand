@@ -1,0 +1,77 @@
+BEGIN;
+ALTER TABLE "MENU" ADD COLUMN "IS_DEMO" BOOLEAN NOT NULL DEFAULT false;
+ALTER TABLE "FOOD" ADD COLUMN "ALLERGENS_VERIFIED" BOOLEAN NOT NULL DEFAULT false;
+
+CREATE FUNCTION vg_assert_menu_publication(menu_key integer) RETURNS void LANGUAGE plpgsql AS $$
+BEGIN
+  -- Sérialise les contrôles de publication d'un même menu, y compris depuis ses images/plats.
+  PERFORM 1 FROM "MENU" WHERE "ID" = menu_key FOR UPDATE;
+  IF EXISTS (SELECT 1 FROM "MENU" WHERE "ID" = menu_key AND "IS_ACTIVE") THEN
+    IF NOT EXISTS (SELECT 1 FROM "MENU_IMAGE" WHERE "MENU_ID" = menu_key)
+       OR NOT EXISTS (SELECT 1 FROM "MENU_FOOD" WHERE "MENU_ID" = menu_key)
+       OR EXISTS (SELECT 1 FROM "MENU_FOOD" mf JOIN "FOOD" f ON f."ID" = mf."FOOD_ID"
+                  WHERE mf."MENU_ID" = menu_key AND NOT f."ALLERGENS_VERIFIED")
+       OR EXISTS (SELECT 1 FROM "MENU_IMAGE" WHERE "MENU_ID" = menu_key
+                  AND (btrim("ALT_TEXT") = '' OR "URI" !~ '^/images/[a-zA-Z0-9_/-]+\.(jpg|jpeg|png|webp|avif)$'))
+       OR EXISTS (SELECT 1 FROM "MENU" WHERE "ID" = menu_key
+                  AND (btrim("TITLE") = '' OR btrim("DESCRIPTION") = '' OR btrim("COMMAND_CONDITIONS") = '')) THEN
+      RAISE EXCEPTION 'MENU_PUBLICATION_INCOMPLETE' USING ERRCODE = '23514';
+    END IF;
+  END IF;
+END;
+$$;
+
+CREATE FUNCTION vg_validate_menu_row() RETURNS trigger LANGUAGE plpgsql AS $$
+BEGIN
+  PERFORM vg_assert_menu_publication(NEW."ID");
+  RETURN NULL;
+END;
+$$;
+CREATE CONSTRAINT TRIGGER "MENU_publication_guard" AFTER INSERT OR UPDATE ON "MENU"
+  DEFERRABLE INITIALLY DEFERRED FOR EACH ROW EXECUTE FUNCTION vg_validate_menu_row();
+
+CREATE FUNCTION vg_validate_menu_link() RETURNS trigger LANGUAGE plpgsql AS $$
+BEGIN
+  IF TG_OP <> 'DELETE' THEN PERFORM vg_assert_menu_publication(NEW."MENU_ID"); END IF;
+  IF TG_OP <> 'INSERT' THEN PERFORM vg_assert_menu_publication(OLD."MENU_ID"); END IF;
+  RETURN NULL;
+END;
+$$;
+CREATE CONSTRAINT TRIGGER "MENU_IMAGE_publication_guard" AFTER INSERT OR UPDATE OR DELETE ON "MENU_IMAGE"
+  DEFERRABLE INITIALLY DEFERRED FOR EACH ROW EXECUTE FUNCTION vg_validate_menu_link();
+CREATE CONSTRAINT TRIGGER "MENU_FOOD_publication_guard" AFTER INSERT OR UPDATE OR DELETE ON "MENU_FOOD"
+  DEFERRABLE INITIALLY DEFERRED FOR EACH ROW EXECUTE FUNCTION vg_validate_menu_link();
+
+CREATE FUNCTION vg_validate_food_menus() RETURNS trigger LANGUAGE plpgsql AS $$
+DECLARE menu_key integer;
+BEGIN
+  FOR menu_key IN SELECT "MENU_ID" FROM "MENU_FOOD" WHERE "FOOD_ID" = NEW."ID" LOOP
+    PERFORM vg_assert_menu_publication(menu_key);
+  END LOOP;
+  RETURN NULL;
+END;
+$$;
+CREATE CONSTRAINT TRIGGER "FOOD_publication_guard" AFTER UPDATE ON "FOOD"
+  DEFERRABLE INITIALLY DEFERRED FOR EACH ROW EXECUTE FUNCTION vg_validate_food_menus();
+
+CREATE FUNCTION vg_invalidate_food_composition() RETURNS trigger LANGUAGE plpgsql AS $$
+BEGIN
+  IF OLD."NAME" IS DISTINCT FROM NEW."NAME" OR OLD."DESCRIPTION" IS DISTINCT FROM NEW."DESCRIPTION" THEN
+    NEW."ALLERGENS_VERIFIED" := false;
+  END IF;
+  RETURN NEW;
+END;
+$$;
+CREATE TRIGGER "FOOD_composition_recheck" BEFORE UPDATE ON "FOOD"
+  FOR EACH ROW EXECUTE FUNCTION vg_invalidate_food_composition();
+
+CREATE FUNCTION vg_invalidate_food_allergens() RETURNS trigger LANGUAGE plpgsql AS $$
+BEGIN
+  IF TG_OP <> 'DELETE' THEN UPDATE "FOOD" SET "ALLERGENS_VERIFIED" = false WHERE "ID" = NEW."FOOD_ID"; END IF;
+  IF TG_OP <> 'INSERT' THEN UPDATE "FOOD" SET "ALLERGENS_VERIFIED" = false WHERE "ID" = OLD."FOOD_ID"; END IF;
+  RETURN NULL;
+END;
+$$;
+CREATE TRIGGER "FOOD_ALLERGEN_recheck" AFTER INSERT OR UPDATE OR DELETE ON "FOOD_ALLERGEN"
+  FOR EACH ROW EXECUTE FUNCTION vg_invalidate_food_allergens();
+COMMIT;

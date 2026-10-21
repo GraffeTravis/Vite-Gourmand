@@ -1,8 +1,8 @@
 # Plan de tests dès le début du développement
 
-20 octobre 2026. Complément de la [feuille de route](FEUILLE-DE-ROUTE.md). Ce document définit les vérifications à construire, pas des résultats déjà obtenus. Existant : neuf cas unitaires RM06/RM07. Les autres tests sont à développer avec les lots concernés.
+20 octobre 2026. Complément de la [feuille de route](FEUILLE-DE-ROUTE.md). La matrice décrit la cible de vérification complète ; seuls les résultats explicitement consignés dans le journal sont acquis.
 
-Mise à jour de réalisation du 20 octobre : 49 tests unitaires et 11 tests PostgreSQL sont maintenant implémentés et réussis localement, avec rapports JUnit. Voir [AVANCEMENT.md](AVANCEMENT.md). Les scénarios ci-dessous restent la cible complète : le test du primitif concurrent de stock ne valide pas à lui seul T11, et le test d'écriture d'outbox ne valide pas le worker de T26.
+Mise à jour du lot catalogue : **78 tests unitaires, 31 tests PostgreSQL et 12 scénarios Chromium bureau/mobile réussis localement**, avec rapports JUnit. Les parcours couvrent filtres combinés sans rechargement, galerie, erreurs/réessai, réponses dépassées, horaires, clavier et axe sur catalogue/fiche. Publication, pagination, minimisation des données publiques et horaires ont des tests PostgreSQL dédiés. Voir [AVANCEMENT.md](AVANCEMENT.md). F04/F10 restent partiels ; les scénarios ci-dessous restent la cible complète : le primitif concurrent de stock ne valide pas à lui seul T11, et l'écriture d'outbox ne valide pas le worker de T26. Ces résultats ne constituent ni une recette multi-navigateurs ni une certification RGAA.
 
 ## 1. Méthode et moyens
 
