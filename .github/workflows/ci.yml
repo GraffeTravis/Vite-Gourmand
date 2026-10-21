@@ -1,7 +1,10 @@
 name: Validation
 on:
   push:
+    branches: [main, develop]
   pull_request:
+    branches: [main, develop]
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -79,9 +82,47 @@ jobs:
           if-no-files-found: ignore
           retention-days: 14
 
+  parcours:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_USER: vg
+          POSTGRES_PASSWORD: test_only
+          POSTGRES_DB: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U vg -d postgres"
+          --health-interval 5s --health-timeout 5s --health-retries 12
+    env:
+      TEST_DATABASE_ADMIN_URL: postgresql://vg:test_only@127.0.0.1:5432/postgres
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: node node_modules/@playwright/test/cli.js install --with-deps chromium
+      - run: npm run test:e2e
+      - name: Rapports navigateur
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: tests-navigateur
+          path: |
+            test-results/e2e.xml
+            test-results/browser
+            playwright-report
+          if-no-files-found: ignore
+          retention-days: 14
+
   validation:
     if: always()
-    needs: [qualite, integration]
+    needs: [qualite, integration, parcours]
     runs-on: ubuntu-latest
     timeout-minutes: 2
     steps:
@@ -89,4 +130,5 @@ jobs:
         env:
           QUALITY_RESULT: ${{ needs.qualite.result }}
           INTEGRATION_RESULT: ${{ needs.integration.result }}
-        run: test "$QUALITY_RESULT" = success && test "$INTEGRATION_RESULT" = success
+          BROWSER_RESULT: ${{ needs.parcours.result }}
+        run: test "$QUALITY_RESULT" = success && test "$INTEGRATION_RESULT" = success && test "$BROWSER_RESULT" = success

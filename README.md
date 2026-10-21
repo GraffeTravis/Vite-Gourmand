@@ -1,6 +1,6 @@
 # Vite & Gourmand
 
-Développement commencé le 20 octobre 2026 dans le dossier applicatif créé par le porteur du projet. Les documents de conception restent dans le dossier parent. Le [journal de développement](docs/AVANCEMENT.md) donne l'état réel de L0/L1 et les points restant à traiter.
+Développement commencé le 20 octobre 2026 dans le dossier applicatif créé par le porteur du projet. Les documents de conception restent dans le dossier parent. Le [journal de développement](docs/AVANCEMENT.md) donne l'état réel des lots et les points restant à traiter.
 
 Stack : Next.js App Router, React, TypeScript strict, PostgreSQL avec Prisma, MongoDB avec le pilote officiel, Docker Compose et Mailpit. Cible applicative : Vercel. Architecture : monolithe modulaire.
 
@@ -12,14 +12,18 @@ Prérequis : Node.js 24 LTS, npm et Docker Desktop avec moteur Linux actif.
 Copy-Item .env.example .env
 npm install
 npm run services:up
+npm run db:deploy
+npm run db:seed
+npm run db:seed:hours
+npm run db:seed:demo
 npm run dev
 ```
 
-Application : http://localhost:3000. Mailpit : http://localhost:8025. L'accueil et le catalogue vide fonctionnent sans base. Les identifiants Compose sont exclusivement destinés au développement local, les ports sont liés à la machine locale.
+Application : http://localhost:3000. Mailpit : http://localhost:8025. Le catalogue et les horaires lisent PostgreSQL ; en cas de panne, un état d'indisponibilité est affiché. Les identifiants Compose sont exclusivement destinés au développement local, les ports sont liés à la machine locale.
 
 PostgreSQL est exposé sur `localhost:5433` pour éviter le service déjà présent sur le port 5432. Le port peut être changé avec `POSTGRES_PORT` ; adapter aussi `DATABASE_URL`. Entre conteneurs, PostgreSQL reste accessible sur `postgres:5432`.
 
-Le schéma métier reste en revue. Deux migrations sont préparées et testées exclusivement sur bases jetables ; ne pas les appliquer à la base de développement avant résolution des décisions concernées. Les tests les appliquent automatiquement dans leur propre base :
+Quatre migrations additives ont été testées et activées dans la base locale initialement vide, après validation des règles de catalogue et des horaires. Les règles des futurs lots restent dans le registre : aucune authentification ou commande n'est déduite de la seule présence de leurs tables. Pour les tests, utiliser une base jetable indépendante :
 
 ```powershell
 npm run db:validate
@@ -27,9 +31,9 @@ Copy-Item .env.test.example .env.test
 npm run test:integration
 ```
 
-Le lanceur crée une base `vg_test_<uuid>`, applique deux fois les migrations, exécute les tests puis supprime uniquement cette base. Il exige `TEST_DATABASE_ADMIN_URL` et ne se rabat jamais sur `DATABASE_URL`. Les fixtures fictives restent dans cette base ; aucun administrateur de production ni contenu de démonstration n'est injecté dans le développement. `services:down` conserve les volumes ; ne pas ajouter `-v` si les données doivent être conservées.
+Le lanceur crée une base `vg_test_<uuid>`, applique deux fois les migrations, exécute les tests puis supprime uniquement cette base. Il exige `TEST_DATABASE_ADMIN_URL` et ne se rabat jamais sur `DATABASE_URL`. Les fixtures automatiques restent dans cette base. `services:down` conserve les volumes ; ne pas ajouter `-v` si les données doivent être conservées.
 
-Après adoption du modèle seulement : `npm run db:deploy`, puis `npm run db:seed` pour les rôles/statuts. Le seed ne crée aucun compte. Les modifications suivantes de schéma se préparent avec `db:migrate` en développement et se livrent par migrations versionnées.
+Les seeds sont séparés : `db:seed` initialise seulement rôles/statuts ; `db:seed:hours` charge les horaires d'accueil fournis pour le projet si la table est vide ; `db:seed:demo` ajoute trois menus marqués fictifs. Les deux derniers scripts refusent une base distante ou de production. Aucun compte ni avis n'est créé. Les valeurs déjà renseignées ne sont pas remplacées lors d'une réexécution. Les modifications de schéma se préparent avec `db:migrate` en développement et se livrent par migration additionnelle ; ne pas modifier une migration déjà appliquée.
 
 ## Vérifier
 
@@ -37,6 +41,8 @@ Après adoption du modèle seulement : `npm run db:deploy`, puis `npm run db:see
 npm run db:validate
 npm run check
 npm run test:integration
+node node_modules/@playwright/test/cli.js install chromium
+npm run test:e2e
 npm run build
 ```
 
@@ -44,11 +50,13 @@ Pour lancer les quatre services dans Docker : `docker compose up --build -d`. Le
 
 ## Périmètre réel
 
-Réalisé localement : routes initiales, charte responsive, polices locales, gestion erreur/404, santé HTTP, connecteurs, validation de configuration au démarrage, modèle Prisma de travail et migrations de revue, seed rejouable, calcul tarifaire D01 et écriture transactionnelle d'outbox. 49 tests unitaires et 11 tests PostgreSQL passent. Workflow GitHub préparé ; voir [VALIDATION.md](docs/VALIDATION.md).
+Réalisé localement : catalogue PostgreSQL avec filtres combinés sans rechargement, pagination, fiche et galerie, publication contrôlée, accueil connecté aux menus/avis approuvés, horaires d'accueil des sept jours, charte responsive et polices locales. Socle de tarification/configuration/outbox conservé. **78 tests unitaires, 31 tests PostgreSQL et 12 parcours Chromium bureau/mobile réussis** ; voir les résultats actualisés dans [VALIDATION.md](docs/VALIDATION.md).
 
-À développer : catalogue connecté, authentification, commande et livraison automatique, espaces client/employé/administrateur, worker d'outbox et envois durables, projection analytique, contact et contenus légaux. Les tables de sessions et d'outbox ne constituent pas ces fonctionnalités complètes. Ce socle ne constitue pas l'application finale ni une certification RGAA.
+À développer : authentification, commande et livraison automatique, espaces client/employé/administrateur, worker d'outbox et envois durables, projection analytique et contact. Les textes légaux sont signalés comme non finalisés. Contact/connexion dans la navigation et action Commander attendent leurs fonctions réelles ; aucun faux formulaire n'est proposé. Les tables techniques ne constituent pas ces fonctionnalités complètes. Les contrôles axe et clavier ne constituent pas une certification RGAA.
 
-Les pages sont volontairement non indexables tant que le site n'est pas ouvert. Aucun déploiement n'est configuré ou exécuté. Avant Vercel : bases managées, secrets serveur, traitement différé durable, sauvegardes et recette. Ne jamais exposer les secrets via `NEXT_PUBLIC_`.
+`test:e2e` construit une version de production, lance Chromium aux largeurs 1440 et 390 px sur le port 3109, puis arrête le serveur et supprime sa base. Il ne réutilise pas une application déjà ouverte. Les rapports et captures restent dans `test-results/` et `playwright-report/`, exclus de Git/Docker.
+
+Les pages sont volontairement non indexables tant que le site n'est pas ouvert. Le projet Vercel est relié à GitHub, mais ses builds échouent encore sur la configuration distante manquante. Bases managées, secrets serveur, traitement différé durable, sauvegardes et recette restent à préparer ; aucun site fonctionnel n'est déclaré livré. Ne jamais exposer les secrets via `NEXT_PUBLIC_`.
 
 `APP_ENV=development` identifie explicitement la configuration locale, y compris lors d'un test local du build de production. En préproduction/production : `APP_ENV=preview` ou `production`, origine `APP_URL` HTTPS, bases et serveur SMTP distants, expéditeur validé. Le serveur refuse une configuration incomplète. La compilation ne dépend d'aucune connexion métier aux bases.
 
@@ -58,6 +66,6 @@ Le [plan de développement](docs/FEUILLE-DE-ROUTE.md) décrit les lots restants,
 
 ## Git
 
-Convention prévue par le CDC : `main`, `develop`, puis une branche par fonctionnalité depuis `develop`. Aucun dépôt distant ni commit de livraison n'est créé automatiquement. Commencer par une revue du socle avant le premier commit.
+Convention prévue par le CDC : `main`, `develop`, puis une branche par fonctionnalité depuis `develop`. Le dépôt distant `origin` désigne [GraffeTravis/Vite-Gourmand](https://github.com/GraffeTravis/Vite-Gourmand). Les trois branches ont été publiées le 21 octobre après autorisation explicite ; `main` et `develop` sont protégées.
 
-Le premier instantané local regroupe le socle et les fondations L0/L1 vérifiées. Les branches `main` et `develop` partent de ce même point, sans historique artificiel. Les prochains travaux partiront de `develop` sur une branche `feature/*`. Aucun dépôt distant n'est configuré et cet instantané ne constitue pas une version de production.
+Le premier instantané local `9e5b034` regroupe le socle et les fondations L0/L1. Le commit GitHub initial `027e156` a été conservé par fusion, sans réécriture d'historique. `main` et `develop` portent le socle ; le catalogue et les horaires restent sur `feature/catalogue-public`, dans la [PR #1](https://github.com/GraffeTravis/Vite-Gourmand/pull/1). La première CI GitHub du catalogue est réussie. Voir le [suivi GitHub](docs/GITHUB.md) et le [journal](docs/AVANCEMENT.md). Le [projet Vercel est relié mais sa configuration reste incomplète](docs/VERCEL.md) ; aucune préproduction fonctionnelle n'est annoncée.

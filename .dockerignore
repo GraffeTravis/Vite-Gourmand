@@ -4,4 +4,6 @@ src/generated
 .git
 .env*
 coverage
+test-results
+playwright-report
 *.log

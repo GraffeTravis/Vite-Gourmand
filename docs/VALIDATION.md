@@ -1,5 +1,19 @@
 # Validation du socle — 20 octobre 2026
 
+## Reprise GitHub — 21 octobre 2026
+
+Sur `feature/catalogue-public`, reprise des vérifications du catalogue avant publication : 78 tests unitaires, 31 tests PostgreSQL et 12 parcours Chromium bureau/mobile réussis. Validation Prisma, génération du client, types stricts, lint et build de production réussis. Les quatre migrations s'appliquent sur base neuve et une seconde application n'ajoute aucune opération. Aucune base `vg_test_*` restante après les suites ; serveur navigateur temporaire arrêté.
+
+La correction ESLint exclut les seuls rapports générés (`playwright-report/`, `test-results/`, `coverage/`) ; exclusion vérifiée par l'API ESLint. Le workflow évite les doublons push/PR des branches de fonctionnalité et autorise un lancement manuel.
+
+Revue de diffusion avant push : cinq révisions et 303 contenus textuels, aucun fichier exclu ni motif ciblé de clé privée/jeton trouvé. Le porteur du projet a ensuite explicitement autorisé la diffusion publique ; les trois branches ont été publiées et la PR catalogue ouverte. Les protections de `main`/`develop` ont été appliquées puis relues via l'API.
+
+[Première CI GitHub](https://github.com/GraffeTravis/Vite-Gourmand/actions/runs/39688885178) réussie sur `9fa80eb` : qualité (installation, Prisma, lint, types, tests, build), intégration PostgreSQL, parcours Chromium et contrôle récapitulatif `validation`. GitGuardian réussit aussi l'analyse des trois commits de la PR. Ces résultats distants complètent les preuves locales ; ils ne valident pas la préproduction.
+
+Le propriétaire a relié son projet Vercel. Son build Preview échoue sur les paramètres serveur et services manquants ; bases et e-mails ne sont pas encore créés. Voir [VERCEL.md](VERCEL.md), [GITHUB.md](GITHUB.md) et [AVANCEMENT.md](AVANCEMENT.md).
+
+Les sections suivantes conservent les résultats historiques du socle et du lot catalogue.
+
 ## Contrôles réussis
 
 - Dépendances installées et `package-lock.json` généré. `npm ci --dry-run --ignore-scripts --no-audit --no-fund` réussit.
@@ -50,3 +64,18 @@ Les sections précédentes décrivent la validation historique du socle. État a
 - Workflow préparé avec `qualite`, `integration` PostgreSQL et `validation` et rapports JUnit. Aucun résultat GitHub ni préproduction n'est déduit de ces contrôles locaux.
 
 Les migrations restent de revue tant que les décisions de modèle concernées ne sont pas finalisées. Les tests de primitives ne valident ni un parcours complet de commande, ni l'authentification, ni une reprise d'outbox. Voir [AVANCEMENT.md](AVANCEMENT.md) et [DECISIONS-A-VALIDER.md](DECISIONS-A-VALIDER.md).
+
+## Complément — catalogue public et horaires, 20 octobre 2026
+
+Cette section actualise les états historiques ci-dessus après réception des décisions D03/D06/D13, des horaires D04 et du suivi global D05.
+
+- **121 contrôles automatisés réussis**, aucun échec ni test ignoré : 78 unitaires, 31 intégrations PostgreSQL, 12 parcours Chromium bureau/mobile. Rapports JUnit locaux : `test-results/unit.xml`, `integration.xml` et `e2e.xml`.
+- Quatre migrations appliquées sur bases jetables puis réappliquées sans opération ; contraintes de publication, invalidation de la vérification des allergènes, suppression concurrente des images, pagination, confidentialité des avis et cohérence des horaires testées.
+- Les parcours exécutent le build de production : filtres combinés sans rechargement complet, réinitialisation, galerie/retour, erreurs 400/404, panne 503/réessai, réponses anciennes, horaires, lien d'évitement clavier et absence de débordement à 1440 et 390 px. axe réussit sur catalogue et fiche ; captures inspectées aux deux formats.
+- Lint sans avertissement, TypeScript strict, Prisma validate et build réussis. Lockfile cohérent, workflow YAML valide et liens internes Markdown présents.
+- Migrations additives activées dans la base locale du projet initialement vide ; 3 menus explicitement fictifs, 12 lignes d'horaires pour les sept jours, zéro compte et zéro avis. Référentiels inchangés. Les initialisations locales ne remplacent pas les données déjà renseignées.
+- Image Docker reconstruite et application relancée sans suppression de volume. Contrôle du serveur local : accueil, catalogue, santé et API en 200 ; API catalogue avec 3 menus et `Cache-Control: no-store` ; groupe de 8 compatible avec un menu ; identifiant absent en 404 ; horaires présents dans le HTML.
+- Vérification PostgreSQL finale : aucune base `vg_test_*` restante. Les données applicatives ont été conservées.
+- La chaîne ESLint garde les cinq alertes élevées de développement déjà décrites ; le pilote pg 8 émet un avertissement amont sur sa file de requêtes. Aucun avertissement n'est masqué ni rétrogradation majeure appliquée.
+
+Limites : cette recette locale ne valide ni GitHub Actions ni la préproduction, et ne certifie pas RGAA. Authentification, commande, devis automatique de livraison, worker d'outbox, e-mails et espaces de gestion restent à développer. F04/F10 restent partiels ; les textes légaux et offres réelles attendent leurs contenus validés. J1 reste incomplet. Les anciennes mentions « aucune migration locale » décrivent le premier état et sont remplacées par ce complément.

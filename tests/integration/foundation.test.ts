@@ -10,11 +10,12 @@ afterAll(() => prisma.$disconnect());
 
 describe("L1 — migrations, référentiels et contraintes réelles PostgreSQL", () => {
   it("réapplique le seed sans doublons ni compte privilégié", async () => {
+    const usersBefore = await prisma.appUser.count();
     await seedReferenceData(prisma);
     await seedReferenceData(prisma);
     expect(await prisma.role.count()).toBe(3);
     expect(await prisma.orderState.count()).toBe(8);
-    expect(await prisma.appUser.count()).toBe(0);
+    expect(await prisma.appUser.count()).toBe(usersBefore);
   });
   it("refuse les variantes de casse et les doublons d'e-mail", async () => {
     const user = await createUser();

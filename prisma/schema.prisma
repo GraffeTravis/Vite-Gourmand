@@ -1,5 +1,5 @@
-// Base de travail issue du MLD v0.1. D01/D02 validés le 20 octobre 2026.
-// D03/D04/D05/D06/D08 restent partiels : voir docs/DECISIONS-A-VALIDER.md.
+// Modèle issu du MLD v0.1 et des décisions du 20 octobre 2026 ; catalogue activé localement.
+// D04 livraison, D05 calendrier/matériel et D08 identité restent à finaliser avant leurs lots.
 
 generator client {
   provider = "prisma-client"
@@ -71,6 +71,7 @@ model Menu {
   commandConditions     String          @map("COMMAND_CONDITIONS") @db.Text
   stock                 Int             @map("STOCK")
   isActive              Boolean         @map("IS_ACTIVE")
+  isDemo                Boolean         @default(false) @map("IS_DEMO")
   theme                 Theme           @relation("MENU_THEME_ID", fields: [themeId], references: [id], onDelete: Restrict)
   diet                  Diet            @relation("MENU_DIET_ID", fields: [dietId], references: [id], onDelete: Restrict)
   menuImageByMenuId     MenuImage[]     @relation("MENU_IMAGE_MENU_ID")
@@ -110,6 +111,7 @@ model Food {
   name                 String         @map("NAME") @db.VarChar(100)
   description          String?        @map("DESCRIPTION") @db.Text
   category             String         @map("CATEGORY") @db.VarChar(30)
+  allergensVerified    Boolean        @default(false) @map("ALLERGENS_VERIFIED")
   menuFoodByFoodId     MenuFood[]     @relation("MENU_FOOD_FOOD_ID")
   foodAllergenByFoodId FoodAllergen[] @relation("FOOD_ALLERGEN_FOOD_ID")
 

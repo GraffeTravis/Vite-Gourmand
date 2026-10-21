@@ -7,6 +7,7 @@ src/generated/
 !.env.example
 !.env.test.example
 test-results/
+playwright-report/
 *.tsbuildinfo
 *.log
 .vercel/

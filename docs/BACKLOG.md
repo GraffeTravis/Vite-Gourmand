@@ -2,7 +2,7 @@
 
 La [feuille de route détaillée](FEUILLE-DE-ROUTE.md) complète cette synthèse avec les lots L0–L10, les dépendances, charges proposées et preuves de sortie. Voir aussi le [plan de tests](PLAN-DE-TESTS.md), la [CI/CD](CI-CD.md) et les [décisions ouvertes](DECISIONS-A-VALIDER.md). Les états ci-dessous restent ceux du socle initial.
 
-L0/L1 ont commencé : voir l'[avancement réel](AVANCEMENT.md) pour les décisions D01/D02, le code et les preuves locales. Aucun jalon de préproduction n'est atteint. La table ci-dessous conserve l'état de départ.
+État actuel : L0/L1 local et lecture publique L2 développés, avec catalogue persistant, filtres, galerie, avis modérés en lecture et horaires du projet. 78 tests unitaires, 31 PostgreSQL et 12 parcours Chromium passent. F04/F10 restent partiels ; comptes, commandes et gestion interne restent à développer. Voir l'[avancement réel](AVANCEMENT.md) pour les décisions et preuves. Aucun jalon de préproduction n'est atteint. La table ci-dessous conserve l'état de départ.
 
 | Lot | Exigences | État | Preuve attendue |
 | --- | --- | --- | --- |
