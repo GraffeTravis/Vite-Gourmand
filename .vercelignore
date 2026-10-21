@@ -1,0 +1,11 @@
+.env*
+.neon
+.git
+.next
+node_modules
+src/generated
+test-results
+playwright-report
+coverage
+*.log
+*.tsbuildinfo

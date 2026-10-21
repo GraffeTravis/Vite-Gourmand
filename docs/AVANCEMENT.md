@@ -1,5 +1,15 @@
 # Journal de développement
 
+## 21 octobre 2026 — préparation du déploiement Vercel
+
+Reprise demandée : déployer correctement le catalogue dans le projet existant. Branche `feature/deploiement-vercel`, issue de `feature/raccordement-bases-distantes`, sans fusion des PR dépendantes.
+
+- Vercel CLI officiel authentifié après accord explicite du propriétaire. Le projet était déclaré générique et ne contenait aucune variable serveur. Configuration corrigée vers Next.js, Node 24 et Francfort ; les sept paramètres de production sont enregistrés comme sensibles, sans connexion SQL de migration ni secrets de production dans les aperçus de PR.
+- Mode d'e-mails explicitement désactivé, car aucun fournisseur n'existe encore et aucune fonction d'envoi n'est livrée. Le transport refuse les envois dans ce mode. HTTPS, bases distantes et validation SMTP lors de son activation restent obligatoires.
+- Contrôle de disponibilité des deux bases protégé par un jeton aléatoire ajouté ; aucune écriture et aucun détail fournisseur retourné. Exclusions d'envoi CLI renforcées pour les secrets locaux et le contexte Neon.
+- Compilation locale réussie, lint/types réussis, 88 tests unitaires réussis. Les premières exécutions sous bac à sable Windows ont rencontré des refus de jonction/renommage ; compilation et tests ont ensuite réussi avec les permissions adaptées, sans changement de dépendances.
+- Livraison candidate, contrôles depuis Vercel et promotion : en cours ; les preuves finales seront ajoutées ici. La [note de déploiement](VERCEL.md) décrit la configuration et les limites.
+
 ## 21 octobre 2026 — raccordement Neon et Atlas
 
 Point de reprise actuel : `feature/raccordement-bases-distantes`, créée à partir du catalogue en revue. Le propriétaire fournit le projet Neon, sa branche `production` et le cluster Atlas Free. La [note de raccordement](NEON-ATLAS.md) conserve les étapes, preuves non sensibles et limites.
