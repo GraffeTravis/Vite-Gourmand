@@ -1,6 +1,6 @@
 # CI/CD GitHub et exploitation sur Vercel
 
-21 octobre 2026. Proposition adaptée au monolithe Next.js du projet. La CI vérifie chaque changement ; la livraison continue prépare une version vérifiée, puis la mise en production reste une action contrôlée. Le workflow `ci.yml` existe et `origin` pointe vers le dépôt GitHub fourni. Publication et protections sont suivies dans [GITHUB.md](GITHUB.md) ; aucun déploiement n'est configuré.
+21 octobre 2026. Proposition adaptée au monolithe Next.js du projet. La CI vérifie chaque changement ; la livraison continue prépare une version vérifiée, puis la mise en production reste une action contrôlée. Les branches sont publiées et protégées ; la première CI GitHub est réussie. Le propriétaire a relié son projet Vercel à GitHub, mais les builds distants échouent sur la configuration manquante : [diagnostic Vercel](VERCEL.md). Aucun workflow de livraison après CI ni déploiement fonctionnel n'est encore validé. Voir [GITHUB.md](GITHUB.md).
 
 Voir aussi la [feuille de route](FEUILLE-DE-ROUTE.md), le [plan de tests](PLAN-DE-TESTS.md) et les décisions [D08–D12](DECISIONS-A-VALIDER.md).
 

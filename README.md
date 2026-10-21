@@ -56,7 +56,7 @@ Réalisé localement : catalogue PostgreSQL avec filtres combinés sans recharge
 
 `test:e2e` construit une version de production, lance Chromium aux largeurs 1440 et 390 px sur le port 3109, puis arrête le serveur et supprime sa base. Il ne réutilise pas une application déjà ouverte. Les rapports et captures restent dans `test-results/` et `playwright-report/`, exclus de Git/Docker.
 
-Les pages sont volontairement non indexables tant que le site n'est pas ouvert. Aucun déploiement n'est configuré ou exécuté. Avant Vercel : bases managées, secrets serveur, traitement différé durable, sauvegardes et recette. Ne jamais exposer les secrets via `NEXT_PUBLIC_`.
+Les pages sont volontairement non indexables tant que le site n'est pas ouvert. Le projet Vercel est relié à GitHub, mais ses builds échouent encore sur la configuration distante manquante. Bases managées, secrets serveur, traitement différé durable, sauvegardes et recette restent à préparer ; aucun site fonctionnel n'est déclaré livré. Ne jamais exposer les secrets via `NEXT_PUBLIC_`.
 
 `APP_ENV=development` identifie explicitement la configuration locale, y compris lors d'un test local du build de production. En préproduction/production : `APP_ENV=preview` ou `production`, origine `APP_URL` HTTPS, bases et serveur SMTP distants, expéditeur validé. Le serveur refuse une configuration incomplète. La compilation ne dépend d'aucune connexion métier aux bases.
 
@@ -66,6 +66,6 @@ Le [plan de développement](docs/FEUILLE-DE-ROUTE.md) décrit les lots restants,
 
 ## Git
 
-Convention prévue par le CDC : `main`, `develop`, puis une branche par fonctionnalité depuis `develop`. Le dépôt distant `origin` désigne [GraffeTravis/Vite-Gourmand](https://github.com/GraffeTravis/Vite-Gourmand). Le dépôt est public ; le rattachement local ne constitue pas une publication ni un déploiement.
+Convention prévue par le CDC : `main`, `develop`, puis une branche par fonctionnalité depuis `develop`. Le dépôt distant `origin` désigne [GraffeTravis/Vite-Gourmand](https://github.com/GraffeTravis/Vite-Gourmand). Les trois branches ont été publiées le 21 octobre après autorisation explicite ; `main` et `develop` sont protégées.
 
-Le premier instantané local `9e5b034` regroupe le socle et les fondations L0/L1. Le commit GitHub initial `027e156` a été conservé par fusion, sans réécriture d'historique. `main` et `develop` portent le socle ; le catalogue et les horaires restent sur `feature/catalogue-public` pour revue. Publication, protections et résultats distants : voir le [suivi GitHub](docs/GITHUB.md) et le [journal](docs/AVANCEMENT.md). La préproduction reste à configurer.
+Le premier instantané local `9e5b034` regroupe le socle et les fondations L0/L1. Le commit GitHub initial `027e156` a été conservé par fusion, sans réécriture d'historique. `main` et `develop` portent le socle ; le catalogue et les horaires restent sur `feature/catalogue-public`, dans la [PR #1](https://github.com/GraffeTravis/Vite-Gourmand/pull/1). La première CI GitHub du catalogue est réussie. Voir le [suivi GitHub](docs/GITHUB.md) et le [journal](docs/AVANCEMENT.md). Le [projet Vercel est relié mais sa configuration reste incomplète](docs/VERCEL.md) ; aucune préproduction fonctionnelle n'est annoncée.

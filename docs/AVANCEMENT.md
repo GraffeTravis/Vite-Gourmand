@@ -8,8 +8,10 @@ Cette entrée constitue le point de reprise actuel. La branche `feature/catalogu
 
 - Dépôt fourni : [GraffeTravis/Vite-Gourmand](https://github.com/GraffeTravis/Vite-Gourmand), public ; compte connecté avec droits d'administration.
 - `origin` configuré dans le sous-dossier applicatif. Le dépôt distant comportait déjà le commit `027e156` avec un README, malgré sa description comme vide. Son historique a été conservé par fusion avec le socle local (`145ee2c`), puis avec la branche catalogue (`b11399b`). Aucun historique supprimé ni push forcé.
-- L'envoi a été refusé par le contrôle automatique, faute d'autorisation explicite de diffusion publique du code. Aucun fichier n'a été envoyé. Les protections, PR et résultats Actions restent à établir après cette confirmation ; le [suivi GitHub](GITHUB.md) décrit le contenu préparé et la séquence.
-- Le porteur du projet prépare Vercel et les bases distantes. Aucun service payant, secret ou déploiement distant n'est configuré par cette reprise. **J1 reste incomplet**.
+- Après un premier refus du contrôle automatique, le porteur du projet a explicitement autorisé la diffusion publique du code, migrations, tests, documentation et trois images de démonstration, en excluant secrets et documents originaux. Les trois branches ont été envoyées sans push forcé ; les deux historiques sont conservés.
+- La [PR #1](https://github.com/GraffeTravis/Vite-Gourmand/pull/1) du catalogue vers `develop` est ouverte en brouillon et attachée au chat. Aucune fusion distante ni promotion en production effectuée. Les modèles d'issues sont publiés ; les issues et le tableau de suivi distant ne sont pas créés par cette reprise.
+- `main` et `develop` sont protégées : PR et `validation` à jour obligatoires, conversations résolues, push forcé et suppression interdits, règles appliquées aussi aux administrateurs. Paramètres relus après application ; pas d'approbateur indépendant imposé au propriétaire seul.
+- Le propriétaire a créé et relié [travis22/vitegourmand](https://vercel.com/travis22/vitegourmand). Il confirme que les bases et le service d'e-mails ne sont pas créés. Le build Vercel de la branche reçoit le code mais échoue sur les paramètres distants manquants ; [diagnostic et suite](VERCEL.md). Aucun service payant, secret ou migration distante créé par cette reprise. **J1 reste incomplet**.
 
 ### Corrections de préparation
 
@@ -23,11 +25,13 @@ Cette entrée constitue le point de reprise actuel. La branche `feature/catalogu
 - Validation Prisma, génération du client, lint et types stricts réussis. Comme lors des lots précédents, Vitest exige ici une exécution hors du bac à sable Windows pour renommer son cache ; aucun test ignoré.
 - Build de production et 12 parcours Chromium bureau/mobile réussis, incluant filtres, galerie, refus 400/404, panne/réessai, réponses anciennes, clavier et axe. Serveur temporaire arrêté par Playwright ; aucune base `vg_test_*` restante après les deux suites.
 - Revue des cinq révisions de l'historique destiné à GitHub : 303 contenus textuels examinés, aucun fichier exclu présent et aucun motif de clé privée/jeton détecté. Cette recherche ciblée ne constitue pas une garantie absolue d'absence de secret. Les fichiers d'environnement réels, originaux de référence, dépendances et rapports restent hors de Git.
+- [Première CI GitHub réussie](https://github.com/GraffeTravis/Vite-Gourmand/actions/runs/39688885178) sur `9fa80eb` : `qualite`, `integration`, `parcours`, puis `validation`. Les quatre contrôles sont confirmés via l'API, sur runners Linux et PostgreSQL jetable ; rapports JUnit/navigateur conservés. GitGuardian a aussi réussi son analyse des trois commits de la PR.
+- Vercel demeure en échec indépendamment de la CI GitHub : `APP_URL`, `DATABASE_URL`, `MONGODB_URI`, `MONGODB_DATABASE`, `SMTP_HOST`, `SMTP_PORT`, `SMTP_FROM` manquent dans le build Preview consulté. L'adresse initiale fournie redirige le visiteur non connecté vers Vercel ; elle ne prouve pas une disponibilité de l'application.
 
 ### Suite
 
-1. Obtenir la confirmation de diffusion publique, publier les branches conservées, ouvrir la PR catalogue et vérifier la CI réelle avant de configurer les protections.
-2. Préparer la préproduction avec les accès fournis par le propriétaire, en conservant l'isolation des bases et les contenus de démonstration explicites. Ne pas annoncer de recette ou de retour applicatif démontré avant leur exécution.
+1. Maintenir la PR catalogue en revue et sa CI à jour ; compléter le suivi distant et conserver les protections. La publication du code ne constitue pas une livraison applicative.
+2. Préparer les bases et e-mails avec le propriétaire, renseigner la préproduction Vercel et ajouter le workflow de livraison après CI, en conservant l'isolation et les contenus de démonstration explicites. La liaison Git actuelle lance des builds automatiquement sans attendre cette porte de livraison. Ne pas annoncer de recette ou de retour applicatif démontré avant leur exécution.
 3. Poursuivre L3 conformément à la feuille de route : identité, sessions et récupération, puis traitement durable d'outbox. Les arbitrages D08/D09 et les règles métier encore ouvertes restent ciblés sur leurs lots.
 
 ## 20 octobre 2026 — poursuite L1 et catalogue public L2

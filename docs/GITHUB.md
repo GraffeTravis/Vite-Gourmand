@@ -6,8 +6,11 @@ Dépôt fourni par le porteur du projet : [GraffeTravis/Vite-Gourmand](https://g
 
 - Le dépôt distant contenait `027e156`, un commit initial avec un README. Il a été conservé avec l'historique local par une fusion, sans push forcé ni remplacement du dépôt.
 - `main` et `develop` conservent le socle L0/L1 ; `feature/catalogue-public` conserve le catalogue, les horaires et les vérifications L2.
-- La publication a été arrêtée par le contrôle automatique : une confirmation explicite de la diffusion publique du code est requise. Aucun envoi Git, PR, protection distante ni exécution Actions n'est annoncé à ce stade.
-- Le propriétaire prépare Vercel et les bases distantes. Aucun abonnement, secret distant, migration distante ni déploiement n'est créé pendant cette préparation.
+- Le porteur du projet a explicitement autorisé la diffusion publique le 21 octobre. `main`, `develop` et `feature/catalogue-public` ont été publiées sans push forcé. Les fichiers exclus ci-dessous restent hors de Git.
+- La [PR #1](https://github.com/GraffeTravis/Vite-Gourmand/pull/1), du catalogue vers `develop`, est ouverte en brouillon. Aucun code n'a été fusionné dans les branches protégées pendant cette reprise.
+- La [première exécution Actions](https://github.com/GraffeTravis/Vite-Gourmand/actions/runs/39688885178), sur `9fa80eb`, est réussie : `qualite`, `integration`, `parcours` et `validation`. Elle vérifie le socle et le catalogue ensemble ; elle ne prouve pas un déploiement Vercel.
+- Les protections de `main` et `develop` sont appliquées et relues via l'API : PR obligatoire, contrôle `validation` à jour, conversations résolues, interdiction des pushs forcés et des suppressions, administrateurs inclus. Aucun second approbateur imposé au propriétaire seul.
+- Le propriétaire a créé le projet Vercel `travis22/vitegourmand` et relié GitHub. Le déploiement automatique de la branche échoue car les paramètres du serveur et des services distants ne sont pas renseignés. Le propriétaire confirme que les bases et le service d'e-mails ne sont pas encore créés ; voir [VERCEL.md](VERCEL.md). Aucun abonnement, secret ni migration distante créé par cette reprise.
 
 ## Contenu préparé
 
@@ -20,12 +23,12 @@ Dépôt fourni par le porteur du projet : [GraffeTravis/Vite-Gourmand](https://g
 
 Les photos restent des exemples fournis avec le prototype ; leur notice et les limites de diffusion sont conservées dans [public/images/demo/README.md](../public/images/demo/README.md). D10 reste ouverte avant une publication commerciale de l'application.
 
-## Séquence prévue après autorisation publique
+## Suite après publication
 
-1. Envoyer `main` et `develop` avec leurs historiques conservés, puis la branche de catalogue ; aucun push forcé.
-2. Ouvrir une PR du catalogue vers `develop`, avec périmètre réel, limites et résultats locaux. Garder distinctes vérification du code et recette de préproduction.
-3. Attendre les résultats Actions et corriger tout échec. Le workflow vérifie qualité, PostgreSQL et parcours Chromium sur des bases jetables, sans secret de production. Le job `validation` ne réussit que si tous les contrôles obligatoires réussissent.
-4. Protéger `main` et `develop` : PR obligatoire, contrôle `validation` à jour, conversations résolues, push forcé et suppression interdits, règles appliquées aussi aux administrateurs. Ne pas imposer l'approbation d'un second compte indisponible au propriétaire seul ; tracer l'auto-revue.
-5. Poursuivre la préproduction lorsque les projets et accès sont disponibles. Ne pas fusionner ou déployer pour simplement faire disparaître un contrôle en attente.
+1. Maintenir la PR catalogue en revue et actualiser ses preuves sur chaque nouveau commit. Garder distinctes vérification du code et recette de préproduction.
+2. Conserver le contrôle `validation` requis : il ne réussit que si qualité, PostgreSQL et parcours Chromium réussissent, sans secret de production.
+3. Créer et isoler les services de préproduction, puis configurer Vercel avec leurs accès via les gestionnaires de secrets appropriés.
+4. Mettre en place le déclenchement de livraison après CI prévu dans [CI-CD.md](CI-CD.md). La liaison Git Vercel actuelle lance des builds automatiquement ; elle ne constitue pas encore cette porte de livraison.
+5. Vérifier migration, santé, parcours et retour applicatif en préproduction avant de déclarer J1 atteint. Ne pas fusionner ou désactiver des contrôles pour masquer une configuration manquante.
 
 Les secrets restent dans les gestionnaires d'environnement appropriés, jamais dans une issue, une PR, un rapport ou le chat. La CI ne dépend pas de Vercel ni de bases managées.

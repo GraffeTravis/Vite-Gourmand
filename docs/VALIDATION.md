@@ -6,7 +6,11 @@ Sur `feature/catalogue-public`, reprise des vérifications du catalogue avant pu
 
 La correction ESLint exclut les seuls rapports générés (`playwright-report/`, `test-results/`, `coverage/`) ; exclusion vérifiée par l'API ESLint. Le workflow évite les doublons push/PR des branches de fonctionnalité et autorise un lancement manuel.
 
-Revue de diffusion avant push : cinq révisions et 303 contenus textuels, aucun fichier exclu ni motif ciblé de clé privée/jeton trouvé. Aucun résultat GitHub ni préproduction annoncé à ce stade : la publication publique attend la confirmation explicite demandée par le contrôle automatique. Voir [GITHUB.md](GITHUB.md) et [AVANCEMENT.md](AVANCEMENT.md).
+Revue de diffusion avant push : cinq révisions et 303 contenus textuels, aucun fichier exclu ni motif ciblé de clé privée/jeton trouvé. Le porteur du projet a ensuite explicitement autorisé la diffusion publique ; les trois branches ont été publiées et la PR catalogue ouverte. Les protections de `main`/`develop` ont été appliquées puis relues via l'API.
+
+[Première CI GitHub](https://github.com/GraffeTravis/Vite-Gourmand/actions/runs/39688885178) réussie sur `9fa80eb` : qualité (installation, Prisma, lint, types, tests, build), intégration PostgreSQL, parcours Chromium et contrôle récapitulatif `validation`. GitGuardian réussit aussi l'analyse des trois commits de la PR. Ces résultats distants complètent les preuves locales ; ils ne valident pas la préproduction.
+
+Le propriétaire a relié son projet Vercel. Son build Preview échoue sur les paramètres serveur et services manquants ; bases et e-mails ne sont pas encore créés. Voir [VERCEL.md](VERCEL.md), [GITHUB.md](GITHUB.md) et [AVANCEMENT.md](AVANCEMENT.md).
 
 Les sections suivantes conservent les résultats historiques du socle et du lot catalogue.
 
