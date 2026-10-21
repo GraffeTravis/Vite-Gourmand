@@ -1,0 +1,12 @@
+node_modules/
+.next/
+out/
+coverage/
+src/generated/
+.env*
+!.env.example
+!.env.test.example
+test-results/
+*.tsbuildinfo
+*.log
+.vercel/

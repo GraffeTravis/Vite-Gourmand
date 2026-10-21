@@ -1,0 +1,37 @@
+name: Fonctionnalité de la feuille de route
+description: Définir un résultat vérifiable pour un lot de Vite & Gourmand.
+title: "[Lx] "
+body:
+  - type: input
+    id: traceability
+    attributes:
+      label: Lot et exigences
+      description: "Exemple : L4, F20–F23, RM05–RM07, T09–T13."
+    validations:
+      required: true
+  - type: textarea
+    id: outcome
+    attributes:
+      label: Résultat attendu
+      description: Décrire ce que l'utilisateur pourra faire et les refus attendus.
+    validations:
+      required: true
+  - type: textarea
+    id: dependencies
+    attributes:
+      label: Dépendances et décisions
+      description: Lier les issues préalables et les arbitrages Dxx concernés.
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Critères d'acceptation et tests
+      description: Succès, erreurs, autorisations, concurrence et accessibilité selon le risque.
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Preuves de vérification
+      description: À compléter avec PR, commit, résultats CI, environnement, date et réserves.

@@ -1,0 +1,25 @@
+name: Anomalie
+description: Décrire une anomalie reproductible et son impact.
+title: "[Anomalie] "
+body:
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction
+      description: Étapes, résultat obtenu et résultat attendu ; données fictives uniquement.
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Environnement et version
+      description: URL de test, navigateur et commit si disponibles. Aucun secret.
+    validations:
+      required: true
+  - type: textarea
+    id: impact
+    attributes:
+      label: Impact et exigences concernées
+      description: Préciser les données, utilisateurs et exigences F/RM/T affectés.
+    validations:
+      required: true

@@ -1,0 +1,337 @@
+// Base de travail issue du MLD v0.1. D01/D02 validés le 20 octobre 2026.
+// D03/D04/D05/D06/D08 restent partiels : voir docs/DECISIONS-A-VALIDER.md.
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Role {
+  id              Int       @id @default(autoincrement()) @map("ID")
+  code            String    @unique @map("CODE") @db.VarChar(20)
+  label           String    @map("LABEL") @db.VarChar(50)
+  appUserByRoleId AppUser[] @relation("APP_USER_ROLE_ID")
+
+  @@map("ROLE")
+}
+
+model AppUser {
+  id                          Int                  @id @default(autoincrement()) @map("ID")
+  roleId                      Int                  @map("ROLE_ID")
+  lastName                    String?              @map("LAST_NAME") @db.VarChar(50)
+  firstName                   String?              @map("FIRST_NAME") @db.VarChar(50)
+  gsm                         String?              @map("GSM") @db.VarChar(20)
+  email                       String               @unique @map("EMAIL") @db.VarChar(254)
+  passwordHash                String               @map("PASSWORD_HASH") @db.VarChar(255)
+  mailAddress                 String?              @map("MAIL_ADDRESS") @db.VarChar(255)
+  postalCode                  String?              @map("POSTAL_CODE") @db.VarChar(20)
+  city                        String?              @map("CITY") @db.VarChar(100)
+  accountState                Boolean              @map("ACCOUNT_STATE")
+  createdAt                   DateTime             @default(now()) @map("CREATED_AT") @db.Timestamptz(3)
+  role                        Role                 @relation("APP_USER_ROLE_ID", fields: [roleId], references: [id], onDelete: Restrict)
+  customerOrderByClientId     CustomerOrder[]      @relation("CUSTOMER_ORDER_CLIENT_ID")
+  orderHistoryByActorId       OrderHistory[]       @relation("ORDER_HISTORY_ACTOR_ID")
+  orderCancellationByAuthorId OrderCancellation[]  @relation("ORDER_CANCELLATION_AUTHOR_ID")
+  reviewByModeratorId         Review[]             @relation("REVIEW_MODERATOR_ID")
+  sessions                    AuthSession[]
+  passwordResetTokens         PasswordResetToken[]
+
+  @@index([roleId])
+  @@map("APP_USER")
+}
+
+model Theme {
+  id            Int    @id @default(autoincrement()) @map("ID")
+  label         String @unique @map("LABEL") @db.VarChar(80)
+  menuByThemeId Menu[] @relation("MENU_THEME_ID")
+
+  @@map("THEME")
+}
+
+model Diet {
+  id           Int    @id @default(autoincrement()) @map("ID")
+  label        String @unique @map("LABEL") @db.VarChar(80)
+  menuByDietId Menu[] @relation("MENU_DIET_ID")
+
+  @@map("DIET")
+}
+
+model Menu {
+  id                    Int             @id @default(autoincrement()) @map("ID")
+  themeId               Int             @map("THEME_ID")
+  dietId                Int             @map("DIET_ID")
+  title                 String          @map("TITLE") @db.VarChar(150)
+  description           String          @map("DESCRIPTION") @db.Text
+  price                 Decimal         @map("PRICE") @db.Decimal(10, 2)
+  minimumNumberPeople   Int             @map("MINIMUM_NUMBER_PEOPLE")
+  commandConditions     String          @map("COMMAND_CONDITIONS") @db.Text
+  stock                 Int             @map("STOCK")
+  isActive              Boolean         @map("IS_ACTIVE")
+  theme                 Theme           @relation("MENU_THEME_ID", fields: [themeId], references: [id], onDelete: Restrict)
+  diet                  Diet            @relation("MENU_DIET_ID", fields: [dietId], references: [id], onDelete: Restrict)
+  menuImageByMenuId     MenuImage[]     @relation("MENU_IMAGE_MENU_ID")
+  menuFoodByMenuId      MenuFood[]      @relation("MENU_FOOD_MENU_ID")
+  customerOrderByMenuId CustomerOrder[] @relation("CUSTOMER_ORDER_MENU_ID")
+
+  @@index([themeId])
+  @@index([dietId])
+  @@map("MENU")
+}
+
+model MenuImage {
+  id           Int    @id @default(autoincrement()) @map("ID")
+  menuId       Int    @map("MENU_ID")
+  uri          String @map("URI") @db.Text
+  altText      String @map("ALT_TEXT") @db.VarChar(255)
+  displayOrder Int    @map("DISPLAY_ORDER")
+  menu         Menu   @relation("MENU_IMAGE_MENU_ID", fields: [menuId], references: [id], onDelete: Restrict)
+
+  @@index([menuId])
+  @@map("MENU_IMAGE")
+}
+
+model MenuFood {
+  menuId       Int  @map("MENU_ID")
+  foodId       Int  @map("FOOD_ID")
+  displayOrder Int  @map("DISPLAY_ORDER")
+  menu         Menu @relation("MENU_FOOD_MENU_ID", fields: [menuId], references: [id], onDelete: Restrict)
+  food         Food @relation("MENU_FOOD_FOOD_ID", fields: [foodId], references: [id], onDelete: Restrict)
+
+  @@id([menuId, foodId])
+  @@map("MENU_FOOD")
+}
+
+model Food {
+  id                   Int            @id @default(autoincrement()) @map("ID")
+  name                 String         @map("NAME") @db.VarChar(100)
+  description          String?        @map("DESCRIPTION") @db.Text
+  category             String         @map("CATEGORY") @db.VarChar(30)
+  menuFoodByFoodId     MenuFood[]     @relation("MENU_FOOD_FOOD_ID")
+  foodAllergenByFoodId FoodAllergen[] @relation("FOOD_ALLERGEN_FOOD_ID")
+
+  @@map("FOOD")
+}
+
+model FoodAllergen {
+  foodId     Int      @map("FOOD_ID")
+  allergenId Int      @map("ALLERGEN_ID")
+  food       Food     @relation("FOOD_ALLERGEN_FOOD_ID", fields: [foodId], references: [id], onDelete: Restrict)
+  allergen   Allergen @relation("FOOD_ALLERGEN_ALLERGEN_ID", fields: [allergenId], references: [id], onDelete: Restrict)
+
+  @@id([foodId, allergenId])
+  @@map("FOOD_ALLERGEN")
+}
+
+model Allergen {
+  id                       Int            @id @default(autoincrement()) @map("ID")
+  label                    String         @unique @map("LABEL") @db.VarChar(80)
+  foodAllergenByAllergenId FoodAllergen[] @relation("FOOD_ALLERGEN_ALLERGEN_ID")
+
+  @@map("ALLERGEN")
+}
+
+model CustomerOrder {
+  id                         Int                @id @default(autoincrement()) @map("ID")
+  clientId                   Int                @map("CLIENT_ID")
+  menuId                     Int                @map("MENU_ID")
+  stateId                    Int                @map("STATE_ID")
+  reference                  String             @unique @map("REFERENCE") @db.VarChar(40)
+  numberPeople               Int                @map("NUMBER_PEOPLE")
+  minimumPeopleSnapshot      Int                @map("MINIMUM_PEOPLE_SNAPSHOT")
+  createdAt                  DateTime           @default(now()) @map("CREATED_AT") @db.Timestamptz(3)
+  serviceDate                DateTime           @map("SERVICE_DATE") @db.Date
+  serviceTime                DateTime           @map("SERVICE_TIME") @db.Time(0)
+  location                   String             @map("LOCATION") @db.VarChar(255)
+  shippingAddress            String             @map("SHIPPING_ADDRESS") @db.VarChar(255)
+  shippingPostalCode         String             @map("SHIPPING_POSTAL_CODE") @db.VarChar(20)
+  shippingCity               String             @map("SHIPPING_CITY") @db.VarChar(100)
+  contactLastName            String             @map("CONTACT_LAST_NAME") @db.VarChar(50)
+  contactFirstName           String             @map("CONTACT_FIRST_NAME") @db.VarChar(50)
+  contactGsm                 String             @map("CONTACT_GSM") @db.VarChar(20)
+  contactEmail               String             @map("CONTACT_EMAIL") @db.VarChar(254)
+  menuTitleSnapshot          String             @map("MENU_TITLE_SNAPSHOT") @db.VarChar(150)
+  unitPriceApplied           Decimal            @map("UNIT_PRICE_APPLIED") @db.Decimal(10, 2)
+  menuSubtotal               Decimal            @map("MENU_SUBTOTAL") @db.Decimal(12, 2)
+  discountRate               Decimal            @map("DISCOUNT_RATE") @db.Decimal(5, 2)
+  discountAmount             Decimal            @map("DISCOUNT_AMOUNT") @db.Decimal(12, 2)
+  shippingDistanceKm         Decimal?           @map("SHIPPING_DISTANCE_KM") @db.Decimal(8, 2)
+  shippingCost               Decimal            @map("SHIPPING_COST") @db.Decimal(12, 2)
+  totalAmount                Decimal            @map("TOTAL_AMOUNT") @db.Decimal(12, 2)
+  client                     AppUser            @relation("CUSTOMER_ORDER_CLIENT_ID", fields: [clientId], references: [id], onDelete: Restrict)
+  menu                       Menu               @relation("CUSTOMER_ORDER_MENU_ID", fields: [menuId], references: [id], onDelete: Restrict)
+  state                      OrderState         @relation("CUSTOMER_ORDER_STATE_ID", fields: [stateId], references: [id], onDelete: Restrict)
+  orderHistoryByOrderId      OrderHistory[]     @relation("ORDER_HISTORY_ORDER_ID")
+  orderCancellationByOrderId OrderCancellation? @relation("ORDER_CANCELLATION_ORDER_ID")
+  equipmentReturnByOrderId   EquipmentReturn?   @relation("EQUIPMENT_RETURN_ORDER_ID")
+  reviewByOrderId            Review?            @relation("REVIEW_ORDER_ID")
+
+  @@index([clientId])
+  @@index([menuId])
+  @@index([stateId])
+  @@map("CUSTOMER_ORDER")
+}
+
+model OrderState {
+  id                     Int             @id @default(autoincrement()) @map("ID")
+  code                   String          @unique @map("CODE") @db.VarChar(40)
+  label                  String          @map("LABEL") @db.VarChar(80)
+  customerOrderByStateId CustomerOrder[] @relation("CUSTOMER_ORDER_STATE_ID")
+  orderHistoryByStateId  OrderHistory[]  @relation("ORDER_HISTORY_STATE_ID")
+
+  @@map("ORDER_STATE")
+}
+
+model OrderHistory {
+  id        Int           @id @default(autoincrement()) @map("ID")
+  orderId   Int           @map("ORDER_ID")
+  stateId   Int           @map("STATE_ID")
+  actorId   Int?          @map("ACTOR_ID")
+  changedAt DateTime      @default(now()) @map("CHANGED_AT") @db.Timestamptz(3)
+  origin    String        @map("ORIGIN") @db.VarChar(20)
+  comment   String?       @map("COMMENT") @db.Text
+  order     CustomerOrder @relation("ORDER_HISTORY_ORDER_ID", fields: [orderId], references: [id], onDelete: Restrict)
+  state     OrderState    @relation("ORDER_HISTORY_STATE_ID", fields: [stateId], references: [id], onDelete: Restrict)
+  actor     AppUser?      @relation("ORDER_HISTORY_ACTOR_ID", fields: [actorId], references: [id], onDelete: Restrict)
+
+  @@index([orderId])
+  @@index([stateId])
+  @@index([actorId])
+  @@map("ORDER_HISTORY")
+}
+
+model OrderCancellation {
+  id             Int           @id @default(autoincrement()) @map("ID")
+  orderId        Int           @unique @map("ORDER_ID")
+  authorId       Int           @map("AUTHOR_ID")
+  cancelledAt    DateTime      @default(now()) @map("CANCELLED_AT") @db.Timestamptz(3)
+  reason         String?       @map("REASON") @db.Text
+  contactChannel String?       @map("CONTACT_CHANNEL") @db.VarChar(30)
+  contactedAt    DateTime?     @map("CONTACTED_AT") @db.Timestamptz(3)
+  contactSummary String?       @map("CONTACT_SUMMARY") @db.Text
+  order          CustomerOrder @relation("ORDER_CANCELLATION_ORDER_ID", fields: [orderId], references: [id], onDelete: Restrict)
+  author         AppUser       @relation("ORDER_CANCELLATION_AUTHOR_ID", fields: [authorId], references: [id], onDelete: Restrict)
+
+  @@index([authorId])
+  @@map("ORDER_CANCELLATION")
+}
+
+model EquipmentReturn {
+  id                   Int           @id @default(autoincrement()) @map("ID")
+  orderId              Int           @unique @map("ORDER_ID")
+  equipmentDescription String        @map("EQUIPMENT_DESCRIPTION") @db.Text
+  notifiedAt           DateTime?     @map("NOTIFIED_AT") @db.Timestamptz(3)
+  dueDate              DateTime?     @map("DUE_DATE") @db.Date
+  returnedAt           DateTime?     @map("RETURNED_AT") @db.Timestamptz(3)
+  lateFeeAmount        Decimal       @map("LATE_FEE_AMOUNT") @db.Decimal(12, 2)
+  lateFeeAppliedAt     DateTime?     @map("LATE_FEE_APPLIED_AT") @db.Timestamptz(3)
+  order                CustomerOrder @relation("EQUIPMENT_RETURN_ORDER_ID", fields: [orderId], references: [id], onDelete: Restrict)
+
+  @@map("EQUIPMENT_RETURN")
+}
+
+model Review {
+  id              Int           @id @default(autoincrement()) @map("ID")
+  orderId         Int           @unique @map("ORDER_ID")
+  moderatorId     Int?          @map("MODERATOR_ID")
+  rating          Int           @map("RATING") @db.SmallInt
+  comment         String        @map("COMMENT") @db.Text
+  moderationState String        @map("MODERATION_STATE") @db.VarChar(20)
+  createdAt       DateTime      @default(now()) @map("CREATED_AT") @db.Timestamptz(3)
+  moderatedAt     DateTime?     @map("MODERATED_AT") @db.Timestamptz(3)
+  order           CustomerOrder @relation("REVIEW_ORDER_ID", fields: [orderId], references: [id], onDelete: Restrict)
+  moderator       AppUser?      @relation("REVIEW_MODERATOR_ID", fields: [moderatorId], references: [id], onDelete: Restrict)
+
+  @@index([moderatorId])
+  @@map("REVIEW")
+}
+
+model BusinessHours {
+  id       Int       @id @default(autoincrement()) @map("ID")
+  weekday  Int       @map("WEEKDAY") @db.SmallInt
+  opensAt  DateTime? @map("OPENS_AT") @db.Time(0)
+  closesAt DateTime? @map("CLOSES_AT") @db.Time(0)
+  isClosed Boolean   @map("IS_CLOSED")
+
+  @@map("BUSINESS_HOURS")
+}
+
+model ContactRequest {
+  id              Int      @id @default(autoincrement()) @map("ID")
+  title           String   @map("TITLE") @db.VarChar(150)
+  description     String   @map("DESCRIPTION") @db.Text
+  email           String   @map("EMAIL") @db.VarChar(254)
+  createdAt       DateTime @default(now()) @map("CREATED_AT") @db.Timestamptz(3)
+  processingState String   @map("PROCESSING_STATE") @db.VarChar(20)
+
+  @@map("CONTACT_REQUEST")
+}
+
+// Supports techniques indépendants de la bibliothèque d'authentification retenue en L3.
+// Seule l'empreinte SHA-256 d'un jeton aléatoire est stockée, jamais le jeton utilisable.
+model AuthSession {
+  id        String    @id @default(uuid()) @map("ID") @db.Uuid
+  userId    Int       @map("USER_ID")
+  tokenHash String    @unique @map("TOKEN_HASH") @db.Char(64)
+  createdAt DateTime  @default(now()) @map("CREATED_AT") @db.Timestamptz(3)
+  expiresAt DateTime  @map("EXPIRES_AT") @db.Timestamptz(3)
+  revokedAt DateTime? @map("REVOKED_AT") @db.Timestamptz(3)
+  user      AppUser   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, revokedAt])
+  @@index([expiresAt])
+  @@map("AUTH_SESSION")
+}
+
+model PasswordResetToken {
+  id         String    @id @default(uuid()) @map("ID") @db.Uuid
+  userId     Int       @map("USER_ID")
+  tokenHash  String    @unique @map("TOKEN_HASH") @db.Char(64)
+  createdAt  DateTime  @default(now()) @map("CREATED_AT") @db.Timestamptz(3)
+  expiresAt  DateTime  @map("EXPIRES_AT") @db.Timestamptz(3)
+  consumedAt DateTime? @map("CONSUMED_AT") @db.Timestamptz(3)
+  user       AppUser   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+  @@map("PASSWORD_RESET_TOKEN")
+}
+
+// Une intention durable et une progression séparée pour chaque consommateur.
+// Le worker, ses baux et les envois effectifs sont réalisés en L3.
+model OutboxEvent {
+  id               String           @id @default(uuid()) @map("ID") @db.Uuid
+  eventKey         String           @unique @map("EVENT_KEY") @db.VarChar(200)
+  type             String           @map("TYPE") @db.VarChar(80)
+  schemaVersion    Int              @default(1) @map("SCHEMA_VERSION")
+  aggregateType    String           @map("AGGREGATE_TYPE") @db.VarChar(40)
+  aggregateId      String           @map("AGGREGATE_ID") @db.VarChar(80)
+  aggregateVersion Int              @map("AGGREGATE_VERSION")
+  payload          Json             @map("PAYLOAD") @db.JsonB
+  createdAt        DateTime         @default(now()) @map("CREATED_AT") @db.Timestamptz(3)
+  deliveries       OutboxDelivery[]
+
+  @@index([aggregateType, aggregateId, aggregateVersion])
+  @@map("OUTBOX_EVENT")
+}
+
+model OutboxDelivery {
+  id            String      @id @default(uuid()) @map("ID") @db.Uuid
+  eventId       String      @map("EVENT_ID") @db.Uuid
+  consumer      String      @map("CONSUMER") @db.VarChar(30)
+  state         String      @default("PENDING") @map("STATE") @db.VarChar(20)
+  attempts      Int         @default(0) @map("ATTEMPTS")
+  availableAt   DateTime    @default(now()) @map("AVAILABLE_AT") @db.Timestamptz(3)
+  leaseToken    String?     @map("LEASE_TOKEN") @db.Uuid
+  lockedUntil   DateTime?   @map("LOCKED_UNTIL") @db.Timestamptz(3)
+  processedAt   DateTime?   @map("PROCESSED_AT") @db.Timestamptz(3)
+  lastErrorCode String?     @map("LAST_ERROR_CODE") @db.VarChar(80)
+  event         OutboxEvent @relation(fields: [eventId], references: [id], onDelete: Restrict)
+
+  @@unique([eventId, consumer])
+  @@index([state, availableAt, lockedUntil])
+  @@map("OUTBOX_DELIVERY")
+}

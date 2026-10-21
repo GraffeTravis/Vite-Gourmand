@@ -1,0 +1,92 @@
+name: Validation
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  qualite:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      APP_ENV: test
+      APP_URL: http://localhost:3000
+      # Compilation sans base connectée dans ce job.
+      DATABASE_URL: postgresql://vg:test_only@127.0.0.1:5432/vg_build
+      MONGODB_URI: mongodb://127.0.0.1:27017
+      MONGODB_DATABASE: vg_build
+      SMTP_HOST: localhost
+      SMTP_PORT: 1025
+      SMTP_FROM: Vite & Gourmand <test@example.test>
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run db:validate
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm run test:unit -- --reporter=default --reporter=junit --outputFile.junit=test-results/unit.xml
+      - run: npm run build
+      - name: Rapport unitaire
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: tests-unitaires
+          path: test-results/unit.xml
+          if-no-files-found: ignore
+          retention-days: 14
+
+  integration:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_USER: vg
+          POSTGRES_PASSWORD: test_only
+          POSTGRES_DB: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U vg -d postgres"
+          --health-interval 5s --health-timeout 5s --health-retries 12
+    env:
+      TEST_DATABASE_ADMIN_URL: postgresql://vg:test_only@127.0.0.1:5432/postgres
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run test:integration -- --reporter=default --reporter=junit --outputFile.junit=test-results/integration.xml
+      - name: Rapport PostgreSQL
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: tests-integration
+          path: test-results/integration.xml
+          if-no-files-found: ignore
+          retention-days: 14
+
+  validation:
+    if: always()
+    needs: [qualite, integration]
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: Vérifier les résultats obligatoires
+        env:
+          QUALITY_RESULT: ${{ needs.qualite.result }}
+          INTEGRATION_RESULT: ${{ needs.integration.result }}
+        run: test "$QUALITY_RESULT" = success && test "$INTEGRATION_RESULT" = success
