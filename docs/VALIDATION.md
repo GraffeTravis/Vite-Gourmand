@@ -1,5 +1,15 @@
 # Validation du socle — 20 octobre 2026
 
+## Reprise GitHub — 21 octobre 2026
+
+Sur `feature/catalogue-public`, reprise des vérifications du catalogue avant publication : 78 tests unitaires, 31 tests PostgreSQL et 12 parcours Chromium bureau/mobile réussis. Validation Prisma, génération du client, types stricts, lint et build de production réussis. Les quatre migrations s'appliquent sur base neuve et une seconde application n'ajoute aucune opération. Aucune base `vg_test_*` restante après les suites ; serveur navigateur temporaire arrêté.
+
+La correction ESLint exclut les seuls rapports générés (`playwright-report/`, `test-results/`, `coverage/`) ; exclusion vérifiée par l'API ESLint. Le workflow évite les doublons push/PR des branches de fonctionnalité et autorise un lancement manuel.
+
+Revue de diffusion avant push : cinq révisions et 303 contenus textuels, aucun fichier exclu ni motif ciblé de clé privée/jeton trouvé. Aucun résultat GitHub ni préproduction annoncé à ce stade : la publication publique attend la confirmation explicite demandée par le contrôle automatique. Voir [GITHUB.md](GITHUB.md) et [AVANCEMENT.md](AVANCEMENT.md).
+
+Les sections suivantes conservent les résultats historiques du socle et du lot catalogue.
+
 ## Contrôles réussis
 
 - Dépendances installées et `package-lock.json` généré. `npm ci --dry-run --ignore-scripts --no-audit --no-fund` réussit.

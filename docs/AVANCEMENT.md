@@ -1,5 +1,35 @@
 # Journal de développement
 
+## 21 octobre 2026 — raccordement GitHub et préparation de publication L0/L1
+
+Cette entrée constitue le point de reprise actuel. La branche `feature/catalogue-public` contient l'avancée L2 du 20 octobre ; `main` et `develop` portaient encore le socle initial. Les décisions du lot catalogue ci-dessous restent acquises et ne sont pas rouvertes.
+
+### Raccordement et cadre de publication
+
+- Dépôt fourni : [GraffeTravis/Vite-Gourmand](https://github.com/GraffeTravis/Vite-Gourmand), public ; compte connecté avec droits d'administration.
+- `origin` configuré dans le sous-dossier applicatif. Le dépôt distant comportait déjà le commit `027e156` avec un README, malgré sa description comme vide. Son historique a été conservé par fusion avec le socle local (`145ee2c`), puis avec la branche catalogue (`b11399b`). Aucun historique supprimé ni push forcé.
+- L'envoi a été refusé par le contrôle automatique, faute d'autorisation explicite de diffusion publique du code. Aucun fichier n'a été envoyé. Les protections, PR et résultats Actions restent à établir après cette confirmation ; le [suivi GitHub](GITHUB.md) décrit le contenu préparé et la séquence.
+- Le porteur du projet prépare Vercel et les bases distantes. Aucun service payant, secret ou déploiement distant n'est configuré par cette reprise. **J1 reste incomplet**.
+
+### Corrections de préparation
+
+- ESLint exclut désormais `playwright-report/`, `test-results/` et `coverage/`. Les rapports HTML générés par les parcours étaient analysés comme du code et ralentissaient fortement le contrôle. L'exclusion est vérifiée avec l'API ESLint ; aucun fichier applicatif n'est exclu en plus.
+- Actions vise les pushs sur `main`/`develop`, les PR vers ces branches et les lancements manuels. Une branche de fonctionnalité passe par sa PR, sans doubler ses quatre jobs à chaque push.
+- README, état CI/CD et suivi GitHub actualisés ; les documents de référence du dossier parent restent intacts.
+
+### Contrôles de reprise
+
+- 78 tests unitaires et 31 tests d'intégration PostgreSQL réussis ; quatre migrations appliquées sur une base vide puis réappliquées sans opération supplémentaire.
+- Validation Prisma, génération du client, lint et types stricts réussis. Comme lors des lots précédents, Vitest exige ici une exécution hors du bac à sable Windows pour renommer son cache ; aucun test ignoré.
+- Build de production et 12 parcours Chromium bureau/mobile réussis, incluant filtres, galerie, refus 400/404, panne/réessai, réponses anciennes, clavier et axe. Serveur temporaire arrêté par Playwright ; aucune base `vg_test_*` restante après les deux suites.
+- Revue des cinq révisions de l'historique destiné à GitHub : 303 contenus textuels examinés, aucun fichier exclu présent et aucun motif de clé privée/jeton détecté. Cette recherche ciblée ne constitue pas une garantie absolue d'absence de secret. Les fichiers d'environnement réels, originaux de référence, dépendances et rapports restent hors de Git.
+
+### Suite
+
+1. Obtenir la confirmation de diffusion publique, publier les branches conservées, ouvrir la PR catalogue et vérifier la CI réelle avant de configurer les protections.
+2. Préparer la préproduction avec les accès fournis par le propriétaire, en conservant l'isolation des bases et les contenus de démonstration explicites. Ne pas annoncer de recette ou de retour applicatif démontré avant leur exécution.
+3. Poursuivre L3 conformément à la feuille de route : identité, sessions et récupération, puis traitement durable d'outbox. Les arbitrages D08/D09 et les règles métier encore ouvertes restent ciblés sur leurs lots.
+
 ## 20 octobre 2026 — poursuite L1 et catalogue public L2
 
 Cette entrée constitue le point de reprise actuel ; l'état initial est conservé plus bas. Branche de travail : `feature/catalogue-public`, créée depuis `develop`. **J1 reste incomplet** : GitHub, CI distante, préproduction et exercice de retour applicatif restent à configurer/vérifier. Aucun lot complet n'est déclaré livré en préproduction.

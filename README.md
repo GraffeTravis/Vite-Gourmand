@@ -66,6 +66,6 @@ Le [plan de développement](docs/FEUILLE-DE-ROUTE.md) décrit les lots restants,
 
 ## Git
 
-Convention prévue par le CDC : `main`, `develop`, puis une branche par fonctionnalité depuis `develop`. Les instantanés de développement sont locaux ; aucun dépôt distant ni déploiement n'est créé automatiquement.
+Convention prévue par le CDC : `main`, `develop`, puis une branche par fonctionnalité depuis `develop`. Le dépôt distant `origin` désigne [GraffeTravis/Vite-Gourmand](https://github.com/GraffeTravis/Vite-Gourmand). Le dépôt est public ; le rattachement local ne constitue pas une publication ni un déploiement.
 
-Le premier instantané local `9e5b034` regroupe le socle et les fondations L0/L1. `main` et `develop` conservent ce point ; la suite est réalisée sur `feature/catalogue-public` depuis `develop`. Aucun dépôt distant n'est configuré ; une PR et une validation en préproduction restent nécessaires avant fusion/livraison.
+Le premier instantané local `9e5b034` regroupe le socle et les fondations L0/L1. Le commit GitHub initial `027e156` a été conservé par fusion, sans réécriture d'historique. `main` et `develop` portent le socle ; le catalogue et les horaires restent sur `feature/catalogue-public` pour revue. Publication, protections et résultats distants : voir le [suivi GitHub](docs/GITHUB.md) et le [journal](docs/AVANCEMENT.md). La préproduction reste à configurer.

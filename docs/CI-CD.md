@@ -1,10 +1,10 @@
 # CI/CD GitHub et exploitation sur Vercel
 
-20 octobre 2026. Proposition adaptée au monolithe Next.js du projet. La CI vérifie chaque changement ; la livraison continue prépare une version vérifiée, puis la mise en production reste une action contrôlée. Ce document décrit la cible : le workflow de vérification `ci.yml` existe aujourd'hui, sans dépôt distant ni déploiement configuré.
+21 octobre 2026. Proposition adaptée au monolithe Next.js du projet. La CI vérifie chaque changement ; la livraison continue prépare une version vérifiée, puis la mise en production reste une action contrôlée. Le workflow `ci.yml` existe et `origin` pointe vers le dépôt GitHub fourni. Publication et protections sont suivies dans [GITHUB.md](GITHUB.md) ; aucun déploiement n'est configuré.
 
 Voir aussi la [feuille de route](FEUILLE-DE-ROUTE.md), le [plan de tests](PLAN-DE-TESTS.md) et les décisions [D08–D12](DECISIONS-A-VALIDER.md).
 
-Réalisation du 20 octobre : `.github/workflows/ci.yml` contient `qualite`, `integration` PostgreSQL, `parcours` Chromium bureau/mobile et `validation`, avec délais, permissions de lecture et rapports conservés 14 jours. Le job qualité construit sans service de base disponible. Les deux suites avec base utilisent chacune leur PostgreSQL jetable ; les parcours visent le serveur compilé et comprennent axe. Les tests MongoDB/Mailpit et les workflows de déploiement restent à ajouter avec les lots concernés. Aucun workflow n'a encore été exécuté sur GitHub ; voir [AVANCEMENT.md](AVANCEMENT.md).
+Réalisation du 20 octobre : `.github/workflows/ci.yml` contient `qualite`, `integration` PostgreSQL, `parcours` Chromium bureau/mobile et `validation`, avec délais, permissions de lecture et rapports conservés 14 jours. Le job qualité construit sans service de base disponible. Les deux suites avec base utilisent chacune leur PostgreSQL jetable ; les parcours visent le serveur compilé et comprennent axe. Le 21 octobre, les déclenchements sont limités aux pushs sur `main`/`develop` et aux PR vers ces branches pour éviter deux suites identiques à chaque push de fonctionnalité ; un lancement manuel est aussi possible. Les rapports générés sont exclus du lint. Les tests MongoDB/Mailpit et les workflows de déploiement restent à ajouter avec les lots concernés. Aucun résultat GitHub n'est déduit des tests locaux ; voir [AVANCEMENT.md](AVANCEMENT.md).
 
 ## 1. Infrastructure proposée
 
