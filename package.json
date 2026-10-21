@@ -27,12 +27,16 @@
     "db:studio": "node node_modules/prisma/build/index.js studio",
     "services:up": "docker compose up -d postgres mongo mailpit",
     "services:down": "docker compose down",
+    "services:check": "node --conditions=react-server --import tsx scripts/check-services.ts",
     "postinstall": "node node_modules/prisma/build/index.js generate"
   },
   "dependencies": {
+    "@neon/config": "^1.9.3",
+    "@neon/env": "^1.6.4",
     "@next/env": "16.4.2",
     "@prisma/adapter-pg": "^7.0.0",
     "@prisma/client": "^7.0.0",
+    "@vercel/functions": "^3.10.2",
     "dotenv": "^17.0.0",
     "mongodb": "^7.0.0",
     "next": "^16.0.0",

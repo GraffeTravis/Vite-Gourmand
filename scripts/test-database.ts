@@ -14,7 +14,7 @@ export async function withTestDatabase(work: (run: Run) => Promise<void>) {
   isolatedUrl.pathname = `/${databaseName}`;
   const childEnvironment = {
     ...process.env, APP_ENV: "test", APP_URL: "http://127.0.0.1:3109",
-    DATABASE_URL: isolatedUrl.href, TEST_DATABASE_URL: isolatedUrl.href,
+    DATABASE_URL: isolatedUrl.href, DATABASE_URL_UNPOOLED: isolatedUrl.href, TEST_DATABASE_URL: isolatedUrl.href,
     MONGODB_URI: "mongodb://127.0.0.1:27017", MONGODB_DATABASE: "vg_test_analytics",
     SMTP_HOST: "localhost", SMTP_PORT: "1025", SMTP_FROM: "Tests <test@example.test>",
   };

@@ -4,6 +4,8 @@
 
 Voir aussi la [feuille de route](FEUILLE-DE-ROUTE.md), le [plan de tests](PLAN-DE-TESTS.md) et les décisions [D08–D12](DECISIONS-A-VALIDER.md).
 
+Le lot Neon/Atlas ajoute une PR dépendante du catalogue : le workflow accepte désormais les PR vers toute branche, tout en conservant les pushs limités à `main`/`develop` pour éviter les doublons. Aucun secret Neon/Atlas n'est fourni à Actions. Les tests forcent `DATABASE_URL` et `DATABASE_URL_UNPOOLED` vers leur propre base locale jetable.
+
 Réalisation du 20 octobre : `.github/workflows/ci.yml` contient `qualite`, `integration` PostgreSQL, `parcours` Chromium bureau/mobile et `validation`, avec délais, permissions de lecture et rapports conservés 14 jours. Le job qualité construit sans service de base disponible. Les deux suites avec base utilisent chacune leur PostgreSQL jetable ; les parcours visent le serveur compilé et comprennent axe. Le 21 octobre, les déclenchements sont limités aux pushs sur `main`/`develop` et aux PR vers ces branches pour éviter deux suites identiques à chaque push de fonctionnalité ; un lancement manuel est aussi possible. Les rapports générés sont exclus du lint. Les tests MongoDB/Mailpit et les workflows de déploiement restent à ajouter avec les lots concernés. Aucun résultat GitHub n'est déduit des tests locaux ; voir [AVANCEMENT.md](AVANCEMENT.md).
 
 ## 1. Infrastructure proposée

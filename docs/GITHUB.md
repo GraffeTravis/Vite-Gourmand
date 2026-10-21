@@ -10,7 +10,7 @@ Dépôt fourni par le porteur du projet : [GraffeTravis/Vite-Gourmand](https://g
 - La [PR #1](https://github.com/GraffeTravis/Vite-Gourmand/pull/1), du catalogue vers `develop`, est ouverte en brouillon. Aucun code n'a été fusionné dans les branches protégées pendant cette reprise.
 - La [première exécution Actions](https://github.com/GraffeTravis/Vite-Gourmand/actions/runs/39688885178), sur `9fa80eb`, est réussie : `qualite`, `integration`, `parcours` et `validation`. Elle vérifie le socle et le catalogue ensemble ; elle ne prouve pas un déploiement Vercel.
 - Les protections de `main` et `develop` sont appliquées et relues via l'API : PR obligatoire, contrôle `validation` à jour, conversations résolues, interdiction des pushs forcés et des suppressions, administrateurs inclus. Aucun second approbateur imposé au propriétaire seul.
-- Le propriétaire a créé le projet Vercel `travis22/vitegourmand` et relié GitHub. Le déploiement automatique de la branche échoue car les paramètres du serveur et des services distants ne sont pas renseignés. Le propriétaire confirme que les bases et le service d'e-mails ne sont pas encore créés ; voir [VERCEL.md](VERCEL.md). Aucun abonnement, secret ni migration distante créé par cette reprise.
+- Le propriétaire a créé le projet Vercel `travis22/vitegourmand` et relié GitHub, puis créé Neon et Atlas Free. Les bases sont désormais raccordées localement et les migrations Neon autorisées sont appliquées : [preuves](NEON-ATLAS.md). Le service d'e-mails et les paramètres d'hébergement restent à préparer ; voir [VERCEL.md](VERCEL.md). Aucun secret publié ni abonnement souscrit par cette reprise.
 
 ## Contenu préparé
 

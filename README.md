@@ -60,6 +60,10 @@ Les pages sont volontairement non indexables tant que le site n'est pas ouvert. 
 
 `APP_ENV=development` identifie explicitement la configuration locale, y compris lors d'un test local du build de production. En préproduction/production : `APP_ENV=preview` ou `production`, origine `APP_URL` HTTPS, bases et serveur SMTP distants, expéditeur validé. Le serveur refuse une configuration incomplète. La compilation ne dépend d'aucune connexion métier aux bases.
 
+Neon et Atlas peuvent être utilisés depuis le serveur local : voir le [raccordement, les preuves et les limites](docs/NEON-ATLAS.md). Le contexte `.neon` et toutes les valeurs `.env*` réelles sont ignorés par Git. L'application utilise la connexion SQL mutualisée `DATABASE_URL` ; Prisma Migrate utilise `DATABASE_URL_UNPOOLED` si elle est renseignée. Les tests forcent les deux URL vers leur base jetable locale.
+
+`npm run services:check` vérifie PostgreSQL et MongoDB en lecture via les connecteurs applicatifs, sans exposer leurs identifiants. L'option `--roundtrip` est réservée aux environnements de contrôle isolés décrits dans la note ; ne pas la lancer sur les données métier. Le rattachement local ne configure pas les secrets ni l'accès réseau Vercel.
+
 Voir [architecture](docs/ARCHITECTURE.md), [références et arbitrages](docs/REFERENCES.md), [backlog](docs/BACKLOG.md) et [validation](docs/VALIDATION.md).
 
 Le [plan de développement](docs/FEUILLE-DE-ROUTE.md) décrit les lots restants, leurs dépendances et leurs critères de sortie. Il est accompagné du [plan de tests](docs/PLAN-DE-TESTS.md), de la [proposition CI/CD GitHub–Vercel](docs/CI-CD.md) et du [registre des décisions à valider](docs/DECISIONS-A-VALIDER.md). Ces documents constituent une feuille de route ; ils ne signalent pas un déploiement ou une recette déjà exécutés.

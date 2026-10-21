@@ -3,7 +3,7 @@ on:
   push:
     branches: [main, develop]
   pull_request:
-    branches: [main, develop]
+    # Inclut les PR dépendantes dont la base est une autre branche de fonctionnalité.
   workflow_dispatch:
 
 permissions:

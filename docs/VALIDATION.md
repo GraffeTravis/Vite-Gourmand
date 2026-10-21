@@ -1,5 +1,13 @@
 # Validation du socle — 20 octobre 2026
 
+## Raccordement Neon et Atlas — 21 octobre 2026
+
+Neon et Atlas sont vérifiés via les connecteurs applicatifs, avec TLS/certificat Neon contrôlés. Quatre migrations éprouvées sur une copie jetable puis appliquées à `production` après accord explicite, seconde application sans opération supplémentaire ; seed rejoué deux fois. Comptages finaux : 22 tables métier, quatre migrations, trois rôles, huit statuts, aucun compte ni menu.
+
+Build de production réussi avec la configuration locale finale ; serveur compilé démarré sur la cible Neon désignée et contrôlé en lecture : accueil, catalogue, API catalogue et santé en 200, JSON du catalogue vide vérifié. Écriture/lecture et nettoyage éprouvés séparément dans la branche Neon et la base Atlas isolées, ensuite supprimées. Les fichiers de connexion de contrôle sont supprimés et les serveurs arrêtés.
+
+78 tests unitaires, 31 tests PostgreSQL locaux et 12 parcours Chromium bureau/mobile réussis. Lint, types, schéma Prisma et cohérence du lockfile vérifiés ; audit des dépendances de production à zéro vulnérabilité. Le HTTP 503 et l'échec de seed dus au délai de transaction `P2028` ont été corrigés et les contrôles concernés rejoués. Voir [les sorties, les échecs récupérés et les limites](NEON-ATLAS.md). La configuration Vercel/SMTP reste distincte de ces résultats locaux.
+
 ## Reprise GitHub — 21 octobre 2026
 
 Sur `feature/catalogue-public`, reprise des vérifications du catalogue avant publication : 78 tests unitaires, 31 tests PostgreSQL et 12 parcours Chromium bureau/mobile réussis. Validation Prisma, génération du client, types stricts, lint et build de production réussis. Les quatre migrations s'appliquent sur base neuve et une seconde application n'ajoute aucune opération. Aucune base `vg_test_*` restante après les suites ; serveur navigateur temporaire arrêté.

@@ -25,4 +25,6 @@ Avant chaque mutation : session vérifiée côté serveur, rôle, propriété, v
 
 `GET /api/health` vérifie uniquement que le processus HTTP répond. Il ne certifie ni les bases ni SMTP.
 
+Neon et Atlas sont raccordés via les connecteurs existants. PostgreSQL reste Prisma/pg, avec pool partagé et gestion du cycle de vie Vercel ; MongoDB conserve le pilote officiel avec pool borné. L'application utilise `DATABASE_URL` mutualisée et les migrations `DATABASE_URL_UNPOOLED` quand elle existe. Les transactions et connexions ont des délais bornés adaptés au démarrage distant. Les tests forcent les deux URL SQL vers leur base jetable. `services:check` vérifie les connecteurs sans exposer de secret ; ses écritures exigent des cibles isolées. Voir [NEON-ATLAS.md](NEON-ATLAS.md).
+
 Les polices sont distribuées localement par les packages Fontsource, sans appel Google Fonts au démarrage. Les tokens reprennent le CDC v1.2, y compris bordure #E4D8CA et footer bordeaux. Les maquettes et données fictives restent des références de conception, sans publication comme faits réels.
