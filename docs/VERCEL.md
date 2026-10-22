@@ -1,6 +1,31 @@
 # Déploiement Vercel — 21 octobre 2026
 
-Projet existant : [travis22/vitegourmand](https://vercel.com/travis22/vitegourmand), relié au dépôt GitHub. Domaine de production vérifié : [vitegourmand.vercel.app](https://vitegourmand.vercel.app). Les premiers builds échouaient parce que le projet utilisait le preset générique et ne contenait aucune variable serveur. Le résultat effectif de cette livraison est consigné dans le journal.
+Projet existant : [travis22/vitegourmand](https://vercel.com/travis22/vitegourmand), relié au dépôt GitHub. **Catalogue publié sur [vitegourmand.vercel.app](https://vitegourmand.vercel.app)** le 21 octobre 2026. Les premiers builds échouaient parce que le projet utilisait le preset générique et ne contenait aucune variable serveur. Neon fonctionne depuis la production ; Atlas reste indisponible depuis Vercel, avec restriction réseau préservée sur instruction du propriétaire.
+
+## Preuves de production
+
+Code déployé : `9a3f8e332ad550f85b903efca52e5718e484b57c`. [Déploiement Vercel](https://vercel.com/travis22/vitegourmand/HsZ8y6UHHUd82k8QSeHh9y4QFTyA), identifiant `dpl_HsZ8y6UHHUd82k8QSeHh9y4QFTyA`, état relu `READY`, fonctions `fra1`. Les compléments documentaires suivants ne changent pas ce code applicatif.
+
+```text
+npm run build                    reussi en local et sur Vercel
+tests unitaires                  88 reussis
+tests PostgreSQL                 31 reussis
+parcours Chromium bureau/mobile  12 reussis
+vercel promote                   Success! vitegourmand was promoted
+GET /                            200, sans session Vercel
+GET /menus                       200, sans session Vercel
+GET /api/menus                   200, menus: [], total: 0
+GET /api/health                  200, status: ok
+GET /mentions-legales            200
+GET /cgv                         200
+GET /menus/<identifiant absent>  404
+GET /api/internal/readiness      404 sans jeton
+GET /api/internal/readiness      503 avec jeton, postgres: true, mongodb: false
+```
+
+[CI GitHub réussie sur le code déployé](https://github.com/GraffeTravis/Vite-Gourmand/actions/runs/39696821830) : qualité, intégration, parcours et validation ; GitGuardian réussi. [Capture de la production](preuves/vercel-production-2026-10-21.png).
+
+Le contrôle automatique a initialement refusé une promotion avec MongoDB indisponible. Après explication, refus de l'ouverture globale et des alternatives proxy/Render, le propriétaire a explicitement demandé la production Vercel. La promotion a ensuite réussi ; elle valide la publication du catalogue et ne rend pas MongoDB disponible.
 
 ## Configuration versionnée
 
@@ -29,9 +54,9 @@ Le mode `MAIL_TRANSPORT=disabled` permet d'afficher le catalogue sans prétendre
 - `GET /api/internal/readiness` vérifie `SELECT 1` et le ping MongoDB, sans écriture. Un en-tête `Authorization: Bearer <READINESS_SECRET>` est obligatoire ; sinon réponse 404 avant toute connexion. Résultat authentifié : 200 si les deux bases répondent, 503 sinon. Seuls des booléens par service sont retournés, sans erreur fournisseur ni chaîne de connexion.
 - Vérifier aussi `/`, `/menus` et `/api/menus`. Une redirection vers la connexion Vercel ne constitue pas une réponse applicative réussie.
 
-L'autorisation réseau Atlas depuis ce poste ne prouve pas l'accès depuis Vercel. Le contrôle doit être exécuté depuis la fonction hébergée ; aucune ouverture globale Atlas n'est appliquée pour le contourner. [Liste d'accès IP Atlas](https://www.mongodb.com/docs/atlas/security/ip-access-list/).
+Atlas n'autorise actuellement que ce poste. Son accès depuis la fonction hébergée échoue. Le propriétaire a refusé `0.0.0.0/0` : formulaire annulé, aucune règle ajoutée ni utilisateur modifié. Une future solution doit conserver une liste réseau limitée. Vercel Hobby utilise des sorties variables ; les [IP statiques Vercel](https://vercel.com/academy/optimize-your-vercel-account/backend-egress) nécessitent une offre payante. Les intermédiaires ont été écartés pour cette livraison. [Liste d'accès IP Atlas](https://www.mongodb.com/docs/atlas/security/ip-access-list/).
 
-Le candidat est envoyé avec `vercel deploy --prod --skip-domain`, puis contrôlé avant `vercel promote`. La protection des déploiements reste en place ; la CLI authentifiée peut vérifier le candidat protégé. Cette livraison ponctuelle demandée par le propriétaire n'implémente pas le workflow futur de [CI-CD.md](CI-CD.md). Les PR dépendantes et les branches protégées sont conservées, sans fusion forcée.
+Le candidat a été envoyé avec `vercel deploy --prod --skip-domain`, puis contrôlé avant `vercel promote`. Le domaine public fonctionne sans authentification ; la protection des autres URL de déploiement reste en place. Cette livraison ponctuelle n'implémente pas le workflow futur de [CI-CD.md](CI-CD.md). Les PR dépendantes et les branches protégées sont conservées, sans fusion forcée. Les aperçus Git échouent encore faute de leur configuration isolée ; ne pas y copier les secrets de production pour les faire passer.
 
 ## Limites
 

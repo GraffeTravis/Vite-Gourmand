@@ -1,6 +1,6 @@
 # Journal de développement
 
-## 21 octobre 2026 — préparation du déploiement Vercel
+## 21 octobre 2026 — catalogue publié sur la production Vercel
 
 Reprise demandée : déployer correctement le catalogue dans le projet existant. Branche `feature/deploiement-vercel`, issue de `feature/raccordement-bases-distantes`, sans fusion des PR dépendantes.
 
@@ -8,7 +8,13 @@ Reprise demandée : déployer correctement le catalogue dans le projet existant.
 - Mode d'e-mails explicitement désactivé, car aucun fournisseur n'existe encore et aucune fonction d'envoi n'est livrée. Le transport refuse les envois dans ce mode. HTTPS, bases distantes et validation SMTP lors de son activation restent obligatoires.
 - Contrôle de disponibilité des deux bases protégé par un jeton aléatoire ajouté ; aucune écriture et aucun détail fournisseur retourné. Exclusions d'envoi CLI renforcées pour les secrets locaux et le contexte Neon.
 - Compilation locale réussie, lint/types réussis, 88 tests unitaires réussis. Les premières exécutions sous bac à sable Windows ont rencontré des refus de jonction/renommage ; compilation et tests ont ensuite réussi avec les permissions adaptées, sans changement de dépendances.
-- Livraison candidate, contrôles depuis Vercel et promotion : en cours ; les preuves finales seront ajoutées ici. La [note de déploiement](VERCEL.md) décrit la configuration et les limites.
+- 31 tests PostgreSQL et 12 parcours Chromium bureau/mobile passent aussi : **131 tests réussis**. La [CI GitHub du candidat](https://github.com/GraffeTravis/Vite-Gourmand/actions/runs/39696821830) réussit sur `9a3f8e332ad550f85b903efca52e5718e484b57c`, ainsi que GitGuardian. [PR #3](https://github.com/GraffeTravis/Vite-Gourmand/pull/3) en brouillon, dépendante de la PR Neon/Atlas.
+- Candidat `dpl_HsZ8y6UHHUd82k8QSeHh9y4QFTyA` construit avec succès sur Vercel ; fonctions exécutées à Francfort. [Inspection](https://vercel.com/travis22/vitegourmand/HsZ8y6UHHUd82k8QSeHh9y4QFTyA). Contrôles authentifiés : accueil, catalogue, API catalogue et santé en 200. Le contrôle privé renvoie 503 avec PostgreSQL disponible et MongoDB indisponible. Aucune donnée métier distante créée.
+- Le contrôle automatique a d'abord refusé la promotion tant que MongoDB est indisponible. Après information sur cette limite et refus des solutions réseau alternatives, le propriétaire demande explicitement de passer directement sur la production Vercel. Cette nouvelle instruction permet la promotion du candidat, sans modifier Atlas ni prétendre que l'analytique fonctionne.
+- Atlas vérifié dans sa console : seule l'adresse de ce poste est autorisée. Le propriétaire refuse explicitement l'ouverture globale `0.0.0.0/0` ; formulaire annulé, aucune règle réseau enregistrée et aucun changement d'utilisateur. **Contrainte de reprise : préserver une liste d'accès réseau limitée.** Recherche d'une sortie stable ou d'un hébergement intermédiaire maîtrisé, avec coût et changement d'architecture explicites avant activation. Aucun abonnement souscrit.
+- **Production publiée : [vitegourmand.vercel.app](https://vitegourmand.vercel.app)**, cible relue `READY` sur le même déploiement et le même code `9a3f8e3`. Contrôles sans session Vercel : `/`, `/menus`, `/api/menus`, `/api/health`, `/mentions-legales` et `/cgv` en 200, fiche absente en 404. JSON du catalogue vide vérifié. Capture navigateur enregistrée dans `docs/preuves/vercel-production-2026-10-21.png`.
+- Contrôle interne authentifié après promotion : PostgreSQL `true`, MongoDB `false`, HTTP 503 ; sans jeton : 404. **Atlas reste à raccorder depuis Vercel**, sans ouverture globale, proxy, intermédiaire Render ou abonnement. SMTP est explicitement désactivé ; aucune fonction d'e-mails n'est annoncée. Catalogue et horaires distants restent sans contenu initialisé.
+- Les builds Preview Git restent sans secrets de production et échouent faute de leur environnement séparé ; le déploiement de production a réussi indépendamment. `main`/`develop` et les PR dépendantes ne sont pas fusionnées. Le journal et la [note de déploiement](VERCEL.md) distinguent cette livraison manuelle du futur workflow CI/CD complet.
 
 ## 21 octobre 2026 — raccordement Neon et Atlas
 

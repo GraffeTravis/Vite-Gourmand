@@ -1,5 +1,13 @@
 # Validation du socle — 20 octobre 2026
 
+## Production Vercel — 21 octobre 2026
+
+Code `9a3f8e332ad550f85b903efca52e5718e484b57c` : compilation locale et Vercel réussies ; lint/types réussis ; 88 tests unitaires, 31 tests PostgreSQL et 12 parcours Chromium bureau/mobile réussis. [CI GitHub](https://github.com/GraffeTravis/Vite-Gourmand/actions/runs/39696821830) et GitGuardian réussis sur ce code. Les suites SQL et navigateur utilisent exclusivement des bases locales jetables, sans accès aux données de production.
+
+Déploiement promu sur [vitegourmand.vercel.app](https://vitegourmand.vercel.app) après demande explicite du propriétaire, informé de la limite MongoDB. État Vercel relu `READY` : `dpl_HsZ8y6UHHUd82k8QSeHh9y4QFTyA`. Contrôles sans session Vercel : accueil, catalogue, API catalogue, santé et pages légales en 200 ; fiche absente en 404. Catalogue vide confirmé dans le JSON, sans contenu fictif distant. Contrôle navigateur et [capture](preuves/vercel-production-2026-10-21.png) conservés.
+
+Limite vérifiée : contrôle privé authentifié en 503, `postgres: true`, `mongodb: false` ; sans jeton, 404 avant connexion. La liste réseau Atlas reste limitée à ce poste : ouverture globale explicitement refusée, formulaire annulé et aucune règle ajoutée. Les e-mails sont explicitement désactivés ; leur transport refuse tout envoi. Les aperçus de PR restent sans configuration isolée et échouent ; leur échec est distinct de la production publiée. [Preuves détaillées et commandes](VERCEL.md).
+
 ## Raccordement Neon et Atlas — 21 octobre 2026
 
 Neon et Atlas sont vérifiés via les connecteurs applicatifs, avec TLS/certificat Neon contrôlés. Quatre migrations éprouvées sur une copie jetable puis appliquées à `production` après accord explicite, seconde application sans opération supplémentaire ; seed rejoué deux fois. Comptages finaux : 22 tables métier, quatre migrations, trois rôles, huit statuts, aucun compte ni menu.
