@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { readServerEnvironment } from "./environment";
+import { readServerEnvironment, requireSmtpConfiguration } from "./environment";
 
 const local = {
   APP_ENV: "development", APP_URL: "http://localhost:3000",
@@ -40,5 +40,21 @@ describe("configuration serveur", () => {
   });
   it("refuse une URL contenant un chemin pour les liens des e-mails", () => {
     expect(() => readServerEnvironment({ ...local, APP_URL: "http://localhost:3000/connexion" })).toThrow("APP_URL");
+  });
+  const mailDisabled = { ...remote, MAIL_TRANSPORT: "disabled", SMTP_HOST: undefined, SMTP_PORT: undefined, SMTP_FROM: undefined };
+  it("accepte explicitement un catalogue distant sans service d'envoi", () => {
+    expect(readServerEnvironment(mailDisabled).MAIL_TRANSPORT).toBe("disabled");
+  });
+  it("refuse toute tentative d'envoi lorsque le transport est désactivé", () => {
+    expect(() => requireSmtpConfiguration(readServerEnvironment(mailDisabled))).toThrow("Envoi d'e-mails désactivé");
+  });
+  it("exige toujours SMTP si le mode n'est pas explicitement désactivé", () => {
+    expect(() => readServerEnvironment({ ...mailDisabled, MAIL_TRANSPORT: undefined })).toThrow("SMTP_HOST");
+  });
+  it.each([{ DATABASE_URL: local.DATABASE_URL }, { APP_URL: "http://preview.example.com" }])("conserve les protections distantes sans e-mails", (override) => {
+    expect(() => readServerEnvironment({ ...mailDisabled, ...override })).toThrow("Configuration distante invalide");
+  });
+  it("refuse un mode d'envoi inconnu", () => {
+    expect(() => readServerEnvironment({ ...remote, MAIL_TRANSPORT: "fake" })).toThrow("MAIL_TRANSPORT");
   });
 });

@@ -1,6 +1,6 @@
 # CI/CD GitHub et exploitation sur Vercel
 
-21 octobre 2026. Proposition adaptée au monolithe Next.js du projet. La CI vérifie chaque changement ; la livraison continue prépare une version vérifiée, puis la mise en production reste une action contrôlée. Les branches sont publiées et protégées ; la première CI GitHub est réussie. Le propriétaire a relié son projet Vercel à GitHub, mais les builds distants échouent sur la configuration manquante : [diagnostic Vercel](VERCEL.md). Aucun workflow de livraison après CI ni déploiement fonctionnel n'est encore validé. Voir [GITHUB.md](GITHUB.md).
+21 octobre 2026. Proposition adaptée au monolithe Next.js du projet. La CI vérifie chaque changement ; la livraison continue ci-dessous reste un plan à implémenter. Le catalogue a été publié **manuellement** sur la production Vercel à la demande explicite du propriétaire, après CI réussie sur `9a3f8e3` : [preuves et limites](VERCEL.md). Neon répond ; Atlas reste non joignable depuis Vercel et sa restriction réseau est préservée ; SMTP est désactivé. Les aperçus Git échouent encore sans environnement séparé. Aucun workflow de livraison après CI, préproduction isolée ou recette de reprise n'est déduit de cette publication. Voir [GITHUB.md](GITHUB.md).
 
 Voir aussi la [feuille de route](FEUILLE-DE-ROUTE.md), le [plan de tests](PLAN-DE-TESTS.md) et les décisions [D08–D12](DECISIONS-A-VALIDER.md).
 
